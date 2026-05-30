@@ -1,0 +1,9 @@
+OK good.
+
+Note the base url for back end is thi @https://eventsandvotes.test , The api is @https://eventsandvotes.test /api
+
+- So for the search don't let it always load on @Commit (Diff of Working State) @input for only search in votes page. Perhaps it should work if i click only the search button.
+- For the register page use the dashboard form content
+- Also after login check the correct message well either success or erro there after it can now move to the admin dashboard
+ - On the admin dashboad i will ant you to create a perfect  well structured admin dashboard check the /Users/ariyoayomikun/Sites/eventsandvotes/resources/views/admin folder files to know what i did there. Replicate all in the admin dashboard there also bind them with permission cause there are some thing only super admin can see(/Users/ariyoayomikun/Sites/eventsandvotes/resources/views/superadmin) use the path for the folder files. Use the correxct api, if it is not in api.php refer to the web.php else now create your own function
+- Also you caan add more features you know it is best and give me the list of added new features. Do this calmly and clean, don't scartter the code. Thanks
