@@ -46,6 +46,7 @@ class EventsService {
       case 'completed':
         path = '/events/past';
         break;
+      case 'upcoming':
       case 'draft':
         path = '/events/upcoming';
         break;

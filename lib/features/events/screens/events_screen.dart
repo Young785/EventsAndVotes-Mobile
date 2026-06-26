@@ -104,7 +104,7 @@ class _EventsScreenState extends State<EventsScreen> {
     final map = {
       'All': '',
       'Active': 'active',
-      'Upcoming': 'draft',
+      'Upcoming': 'upcoming',
       'Completed': 'completed',
     };
     setState(() => _status = map[s] ?? '');
@@ -197,7 +197,7 @@ class _EventsScreenState extends State<EventsScreen> {
     final map = {
       'All': '',
       'Active': 'active',
-      'Upcoming': 'draft',
+      'Upcoming': 'upcoming',
       'Completed': 'completed',
     };
 

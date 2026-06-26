@@ -34,9 +34,19 @@ class CartService {
     );
   }
 
-  Future<Map<String, dynamic>> checkout() async {
+  Future<Map<String, dynamic>> checkout({
+    String? fullName,
+    String? customerEmail,
+  }) async {
     try {
-      final response = await _api.post('/cart/checkout');
+      final data = <String, dynamic>{};
+      if (fullName != null && fullName.isNotEmpty) {
+        data['full_name'] = fullName;
+      }
+      if (customerEmail != null && customerEmail.isNotEmpty) {
+        data['customer_email'] = customerEmail;
+      }
+      final response = await _api.post('/cart/checkout', data: data);
       return Map<String, dynamic>.from(response.data);
     } catch (e) {
       throw Exception(_handleError(e, 'Checkout failed'));

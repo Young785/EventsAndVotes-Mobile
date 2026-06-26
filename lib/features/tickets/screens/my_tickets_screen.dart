@@ -17,6 +17,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../models/ticket_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
+import '../../../shared/widgets/ticket_qr_image.dart';
 
 class MyTicketsScreen extends StatefulWidget {
   const MyTicketsScreen({super.key});
@@ -420,28 +421,16 @@ class _WalletPassCard extends StatelessWidget {
                             border: Border.all(
                                 color: Colors.black12, width: 0.5),
                           ),
-                          child: token != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(7),
-                                  child: Image.network(
-                                    TicketsService()
-                                        .qrImageUrl(ticket.uuid, size: 64),
-                                    fit: BoxFit.cover,
-                                    headers: {
-                                      'Authorization': 'Bearer $token',
-                                    },
-                                    errorBuilder: (_, __, ___) => const Icon(
-                                      Icons.qr_code_2_rounded,
-                                      size: 36,
-                                      color: AppColors.textHint,
-                                    ),
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.qr_code_2_rounded,
-                                  size: 36,
-                                  color: AppColors.textHint,
-                                ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(7),
+                            child: TicketQrImage(
+                              ticketUuid: ticket.uuid,
+                              authToken: token,
+                              backendQrUrl: ticket.backendQrUrl,
+                              size: 62,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Padding(
@@ -953,8 +942,6 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final qrUrl =
-        TicketsService().qrImageUrl(widget.ticket.uuid, size: 190);
     final bottomPad = MediaQuery.of(context).padding.bottom;
 
     return Container(
@@ -996,22 +983,12 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.border),
               ),
-              child: widget.token != null
-                  ? Image.network(
-                      qrUrl,
-                      width: 190,
-                      height: 190,
-                      headers: {
-                        'Authorization': 'Bearer ${widget.token}'
-                      },
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.qr_code_2_rounded,
-                        size: 110,
-                        color: AppColors.textHint,
-                      ),
-                    )
-                  : const Icon(Icons.qr_code_2_rounded,
-                      size: 110, color: AppColors.textHint),
+              child: TicketQrImage(
+                ticketUuid: widget.ticket.uuid,
+                authToken: widget.token,
+                backendQrUrl: widget.ticket.backendQrUrl,
+                size: 190,
+              ),
             ),
             const SizedBox(height: 12),
             // Entry code

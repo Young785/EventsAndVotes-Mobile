@@ -96,131 +96,148 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: _initialLoad
             ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 24),
-                    Center(
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.warningLight,
-                          borderRadius: BorderRadius.circular(24),
+            : LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact = constraints.maxHeight < 700;
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        SizedBox(height: compact ? 16 : 32),
+                        Container(
+                          width: compact ? 64 : 72,
+                          height: compact ? 64 : 72,
+                          decoration: BoxDecoration(
+                            color: AppColors.warningLight,
+                            borderRadius: BorderRadius.circular(22),
+                          ),
+                          child: Icon(
+                            Icons.mark_email_unread_outlined,
+                            size: compact ? 32 : 36,
+                            color: AppColors.warning,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.mark_email_unread_outlined,
-                          size: 40,
-                          color: AppColors.warning,
+                        SizedBox(height: compact ? 16 : 20),
+                        Text(
+                          'Verify your email',
+                          style: AppTextStyles.displayMedium.copyWith(
+                            fontSize: compact ? 22 : null,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Verify your email',
-                      style: AppTextStyles.displayMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'We sent a 6-digit verification code to $email. '
-                      'Enter the code below to access your dashboard.',
-                      style: AppTextStyles.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.04),
-                            blurRadius: 24,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          AppTextField(
-                            label: 'Verification Code',
-                            hint: 'Enter 6-digit code',
-                            controller: _codeCtrl,
-                            keyboardType: TextInputType.number,
-                            prefix: const Icon(
-                              Icons.pin_outlined,
-                              size: 18,
-                              color: AppColors.textHint,
-                            ),
-                            onChanged: (v) {
-                              final digits = v.replaceAll(RegExp(r'\D'), '');
-                              final trimmed = digits.length > 6
-                                  ? digits.substring(0, 6)
-                                  : digits;
-                              if (trimmed != v) {
-                                _codeCtrl.value = TextEditingValue(
-                                  text: trimmed,
-                                  selection: TextSelection.collapsed(
-                                    offset: trimmed.length,
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Check your inbox and spam folder for the code.',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          AppButton(
-                            label: 'Verify Email',
-                            onTap: _verify,
-                            isLoading: _verifying,
-                            width: double.infinity,
-                          ),
-                          const SizedBox(height: 16),
-                          Center(
-                            child: _resending
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
+                        const SizedBox(height: 8),
+                        Text(
+                          'We sent a 6-digit code to $email. '
+                          'Enter it below to access your dashboard.',
+                          style: AppTextStyles.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: compact ? 20 : 28),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(compact ? 16 : 20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 24,
+                                      offset: const Offset(0, 4),
                                     ),
-                                  )
-                                : TextButton(
-                                    onPressed: _resend,
-                                    child: const Text(
-                                      'Resend code',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.primary,
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    AppTextField(
+                                      label: 'Verification Code',
+                                      hint: 'Enter 6-digit code',
+                                      controller: _codeCtrl,
+                                      keyboardType: TextInputType.number,
+                                      prefix: const Icon(
+                                        Icons.pin_outlined,
+                                        size: 18,
+                                        color: AppColors.textHint,
+                                      ),
+                                      onChanged: (v) {
+                                        final digits =
+                                            v.replaceAll(RegExp(r'\D'), '');
+                                        final trimmed = digits.length > 6
+                                            ? digits.substring(0, 6)
+                                            : digits;
+                                        if (trimmed != v) {
+                                          _codeCtrl.value = TextEditingValue(
+                                            text: trimmed,
+                                            selection: TextSelection.collapsed(
+                                              offset: trimmed.length,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Check your inbox and spam folder.',
+                                      style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.textSecondary,
                                       ),
                                     ),
-                                  ),
+                                    SizedBox(height: compact ? 16 : 20),
+                                    AppButton(
+                                      label: 'Verify Email',
+                                      onTap: _verify,
+                                      isLoading: _verifying,
+                                      width: double.infinity,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Center(
+                                      child: _resending
+                                          ? const SizedBox(
+                                              width: 22,
+                                              height: 22,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : TextButton(
+                                              onPressed: _resend,
+                                              child: const Text(
+                                                'Resend code',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.primary,
+                                                ),
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        TextButton(
+                          onPressed: () => signOutUser(context),
+                          child: const Text('Sign out'),
+                        ),
+                        SizedBox(height: compact ? 8 : 16),
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                    TextButton(
-                      onPressed: () => signOutUser(context),
-                      child: const Text('Sign out'),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
       ),
     );

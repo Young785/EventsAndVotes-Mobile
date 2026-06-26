@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/tickets_service.dart';
 
 class TicketModel {
   final String uuid;
@@ -19,6 +20,7 @@ class TicketModel {
   /// Gradient colours from the ticket template (e.g. "Gradient Concert").
   final Color? templatePrimary;
   final Color? templateSecondary;
+  final String? backendQrUrl;
 
   TicketModel({
     required this.uuid,
@@ -37,6 +39,7 @@ class TicketModel {
     this.createdAt,
     this.templatePrimary,
     this.templateSecondary,
+    this.backendQrUrl,
   });
 
   TicketModel copyWith({String? eventPoster}) => TicketModel(
@@ -56,6 +59,7 @@ class TicketModel {
         createdAt: createdAt,
         templatePrimary: templatePrimary,
         templateSecondary: templateSecondary,
+        backendQrUrl: backendQrUrl,
       );
 
   String get entryCode =>
@@ -137,13 +141,6 @@ class TicketModel {
         ) ??
         _hexColor(template?['preview_secondary']?.toString());
 
-    debugPrint(
-      '[TicketModel] poster: $poster | '
-      'templatePrimary: ${theme?['primary']} | '
-      'templateSecondary: ${theme?['secondary']}',
-    );
-
-    // Extract customer info from metadata if not at top level
     final meta = json['metadata'] as Map<String, dynamic>?;
 
     return TicketModel(
@@ -170,6 +167,7 @@ class TicketModel {
           json['created_at']?.toString(),
       templatePrimary: primary,
       templateSecondary: secondary,
+      backendQrUrl: TicketsService.qrUrlFromTicketJson(json),
     );
   }
 

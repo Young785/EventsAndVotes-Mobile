@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../../core/services/notification_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/list_response_utils.dart';
 
 class NotificationsSheet extends StatefulWidget {
   final VoidCallback? onCountChanged;
@@ -26,34 +27,70 @@ class NotificationsSheet extends StatefulWidget {
 }
 
 class _NotificationsSheetState extends State<NotificationsSheet> {
+  static const _pageSize = 5;
+
   final _service = NotificationService();
   bool _loading = true;
+  bool _loadingMore = false;
   List<Map<String, dynamic>> _items = [];
+  int _page = 1;
+  int _lastPage = 1;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _load(reset: true);
   }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    try {
-      final items = await _service.getRecent(limit: 30);
-      if (mounted) setState(() {
-        _items = items;
-        _loading = false;
+  bool get _hasMore => _page < _lastPage;
+
+  Future<void> _load({bool reset = false}) async {
+    if (reset) {
+      setState(() {
+        _loading = true;
+        _page = 1;
       });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
     }
+
+    try {
+      final response = await _service.getNotifications(
+        page: _page,
+        perPage: _pageSize,
+      );
+      final items = parseListItems(response['data'] as List?);
+      final meta = response['meta'] as Map<String, dynamic>? ?? {};
+
+      if (mounted) {
+        setState(() {
+          _items = reset ? items : [..._items, ...items];
+          _lastPage = meta['last_page'] ?? meta['total_pages'] ?? 1;
+          _loading = false;
+          _loadingMore = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          if (reset) _items = [];
+          _loading = false;
+          _loadingMore = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_loadingMore || !_hasMore) return;
+    setState(() => _loadingMore = true);
+    _page++;
+    await _load();
   }
 
   Future<void> _markAllRead() async {
     try {
       await _service.markAllAsRead();
       widget.onCountChanged?.call();
-      await _load();
+      await _load(reset: true);
     } catch (_) {}
   }
 
@@ -61,7 +98,13 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
     try {
       await _service.markAsRead(id);
       widget.onCountChanged?.call();
-      await _load();
+      final index = _items.indexWhere((n) => n['id']?.toString() == id);
+      if (index != -1 && mounted) {
+        setState(() {
+          _items[index] = Map<String, dynamic>.from(_items[index])
+            ..['read_at'] = DateTime.now().toIso8601String();
+        });
+      }
     } catch (_) {}
   }
 
@@ -115,10 +158,46 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
                         ),
                       )
                     : ListView.separated(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: _items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                        itemCount: _items.length + 1,
+                        separatorBuilder: (_, index) {
+                          if (index >= _items.length - 1) {
+                            return const SizedBox(height: 8);
+                          }
+                          return const SizedBox(height: 8);
+                        },
                         itemBuilder: (_, i) {
+                          if (i == _items.length) {
+                            if (!_hasMore) return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4, bottom: 8),
+                              child: Center(
+                                child: _loadingMore
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : OutlinedButton(
+                                        onPressed: _loadMore,
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: AppColors.primary,
+                                          side: const BorderSide(
+                                            color: AppColors.primary,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: const Text('Load more'),
+                                      ),
+                              ),
+                            );
+                          }
+
                           final n = _items[i];
                           final data = n['data'] is Map
                               ? Map<String, dynamic>.from(n['data'] as Map)

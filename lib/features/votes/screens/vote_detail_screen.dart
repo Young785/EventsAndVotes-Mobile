@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/votes_service.dart';
+import '../../../core/services/cart_service.dart';
+import '../../../core/services/payment_service.dart';
+import '../../../features/auth/providers/auth_provider.dart';
 import '../models/vote_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/detail_back_button.dart';
@@ -27,6 +32,8 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
   List<dynamic> _positions = [];
   bool _loading = true;
   final VotesService _votesService = VotesService();
+  final CartService _cartService = CartService();
+  final PaymentService _paymentService = PaymentService();
 
 
   @override
@@ -53,6 +60,78 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
           _loading = false;
         });
       }
+    }
+  }
+
+  void _showSnack(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppColors.error : AppColors.success,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _submitVote({
+    required String nomineeId,
+    required int positionId,
+    required int quantity,
+  }) async {
+    final auth = context.read<AuthProvider>();
+    if (!auth.isAuthenticated) {
+      context.go('/login');
+      return;
+    }
+
+    final vote = _vote;
+    if (vote == null) return;
+
+    _showSnack('Submitting vote...');
+
+    try {
+      if (vote.isFree) {
+        await _votesService.voteForNominee(nomineeId, quantity: quantity);
+        if (!mounted) return;
+        _showSnack('Successfully cast $quantity vote(s)!');
+        await _load();
+        return;
+      }
+
+      final voteId = int.tryParse(vote.voteId) ?? vote.id;
+      await _cartService.addToCart(
+        voteId: voteId,
+        positionId: positionId,
+        nomineeId: int.parse(nomineeId),
+        quantity: quantity,
+      );
+
+      final user = auth.user!;
+      final checkout = await _cartService.checkout(
+        fullName: user.fullName,
+        customerEmail: user.email,
+      );
+
+      if (!mounted) return;
+
+      final paid = await _paymentService.launchFromCartCheckout(
+        context: context,
+        checkoutResponse: checkout,
+      );
+
+      if (!mounted) return;
+
+      if (paid) {
+        _showSnack('Payment successful! Your votes have been cast.');
+        await _load();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      _showSnack(
+        e.toString().replaceAll('Exception: ', ''),
+        isError: true,
+      );
     }
   }
 
@@ -321,7 +400,11 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
                       ..._positions.asMap().entries.map(
                         (e) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
-                          child: _PositionCard(position: e.value, vote: _vote!)
+                          child: _PositionCard(
+                            position: e.value,
+                            vote: _vote!,
+                            onSubmitVote: _submitVote,
+                          )
                               .animate()
                               .fadeIn(
                                 delay: (220 + e.key * 40).ms,
@@ -447,7 +530,38 @@ class _DateCard extends StatelessWidget {
 class _PositionCard extends StatelessWidget {
   final dynamic position;
   final VoteModel vote;
-  const _PositionCard({required this.position, required this.vote});
+  final Future<void> Function({
+    required String nomineeId,
+    required int positionId,
+    required int quantity,
+  }) onSubmitVote;
+
+  const _PositionCard({
+    required this.position,
+    required this.vote,
+    required this.onSubmitVote,
+  });
+
+  String _nomineeId(Map<dynamic, dynamic> nominee) =>
+      nominee['nominees_id']?.toString() ??
+      nominee['id']?.toString() ??
+      '';
+
+  String _nomineeLabel(Map<dynamic, dynamic> nominee) {
+    final first = nominee['first_name']?.toString() ?? '';
+    final last = nominee['last_name']?.toString() ?? '';
+    final full = '$first $last'.trim();
+    if (full.isNotEmpty) return full;
+    return nominee['name']?.toString() ??
+        nominee['nick_name']?.toString() ??
+        'Nominee';
+  }
+
+  int _positionId() {
+    final raw = position['id'] ?? position['position_id'];
+    if (raw is int) return raw;
+    return int.tryParse(raw?.toString() ?? '') ?? 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -563,18 +677,24 @@ class _PositionCard extends StatelessWidget {
                       )
                     else
                       ...nominees.map(
-                        (n) => RadioListTile<String>(
-                          title: Text(
-                            n['name'] ?? 'Nominee',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          value: n['id']?.toString() ?? '',
-                          groupValue: selectedNominee,
-                          onChanged:
-                              (v) => setDialogState(() => selectedNominee = v),
-                          activeColor: AppColors.primary,
-                          contentPadding: EdgeInsets.zero,
-                        ),
+                        (n) {
+                          final nominee = Map<dynamic, dynamic>.from(n as Map);
+                          final id = _nomineeId(nominee);
+                          return RadioListTile<String>(
+                            title: Text(
+                              _nomineeLabel(nominee),
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            value: id,
+                            groupValue: selectedNominee,
+                            onChanged: id.isEmpty
+                                ? null
+                                : (v) =>
+                                    setDialogState(() => selectedNominee = v),
+                            activeColor: AppColors.primary,
+                            contentPadding: EdgeInsets.zero,
+                          );
+                        },
                       ),
                     const SizedBox(height: 16),
                     if (!vote.isFree) ...[
@@ -684,45 +804,20 @@ class _PositionCard extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed:
-                    selectedNominee == null
+                    selectedNominee == null || selectedNominee!.isEmpty
                         ? null
                         : () async {
+                          final nomineeId = selectedNominee!;
+                          final quantity =
+                              int.tryParse(quantityCtrl.text) ?? 1;
+                          final positionId = _positionId();
                           Navigator.pop(context);
-                          final quantity = int.tryParse(quantityCtrl.text) ?? 1;
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text('Submitting vote...'),
-                                ],
-                              ),
-                              backgroundColor: AppColors.primary,
-                              duration: const Duration(seconds: 2),
-                            ),
+                          await onSubmitVote(
+                            nomineeId: nomineeId,
+                            positionId: positionId,
+                            quantity: quantity,
                           );
-
-                          await Future.delayed(const Duration(seconds: 2));
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Successfully cast $quantity vote(s)!',
-                                ),
-                                backgroundColor: AppColors.success,
-                              ),
-                            );
-                          }
                         },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

@@ -36,6 +36,17 @@ class NotificationService {
     return parseListItems(parsed['data'] as List?);
   }
 
+  Future<Map<String, dynamic>> getNotifications({
+    int page = 1,
+    int perPage = 5,
+  }) async {
+    final response = await _apiClient.get(
+      '/admin/notifications',
+      params: {'page': page, 'per_page': perPage},
+    );
+    return parsePaginatedResponse(response.data);
+  }
+
   Future<void> markAsRead(String id) async {
     await _apiClient.put('/admin/notifications/$id/read');
   }

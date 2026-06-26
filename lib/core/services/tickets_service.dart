@@ -61,11 +61,45 @@ class TicketsService {
   String qrImageUrl(String uuid, {int size = 220}) =>
       '${_api.dio.options.baseUrl}/tickets/$uuid/qr-image?size=$size';
 
+  static String? qrUrlFromTicketJson(Map<String, dynamic> json) {
+    for (final key in [
+      'qr_image_url',
+      'qr_code_url',
+      'qr_code',
+      'qr_url',
+    ]) {
+      final value = json[key]?.toString().trim();
+      if (value != null && value.isNotEmpty) {
+        if (value.startsWith('http://') || value.startsWith('https://')) {
+          return value;
+        }
+      }
+    }
+    return null;
+  }
+
   Future<Uint8List?> getQrImageBytes(String uuid, {int size = 200}) async {
     try {
       final response = await _api.dio.get<List<int>>(
         '/tickets/$uuid/qr-image',
         queryParameters: {'size': size},
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final data = response.data;
+      return data != null ? Uint8List.fromList(data) : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<Uint8List?> getQrImageBytesFromUrl(
+    String url, {
+    int? size,
+  }) async {
+    try {
+      final response = await _api.dio.get<List<int>>(
+        url,
+        queryParameters: size != null ? {'size': size} : null,
         options: Options(responseType: ResponseType.bytes),
       );
       final data = response.data;
