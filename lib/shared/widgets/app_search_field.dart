@@ -24,15 +24,8 @@ class AppSearchField extends StatelessWidget {
       height: 48,
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14),
+        // No border, no shadow — clean white fill only
       ),
       child: TextField(
         controller: controller,
@@ -50,7 +43,7 @@ class AppSearchField extends StatelessWidget {
             color: AppColors.textHint,
           ),
           prefixIcon: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(13),
             child: HugeIcon(
               icon: HugeIcons.strokeRoundedSearch01,
               color: AppColors.textHint,
@@ -72,6 +65,8 @@ class AppSearchField extends StatelessWidget {
           focusedBorder: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
           isDense: true,
+          filled: true,
+          fillColor: AppColors.white,
         ),
       ),
     );

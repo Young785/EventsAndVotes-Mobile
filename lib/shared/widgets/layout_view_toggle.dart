@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Toggles between list and 2-column grid layout.
@@ -14,22 +15,22 @@ class LayoutViewToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: () => onChanged(!isGrid),
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: 42,
-          height: 38,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Icon(
-            isGrid ? Icons.view_list_rounded : Icons.grid_view_rounded,
-            size: 20,
+    return GestureDetector(
+      onTap: () => onChanged(!isGrid),
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          // matches search field — no border
+        ),
+        child: Center(
+          child: HugeIcon(
+            icon: isGrid
+                ? HugeIcons.strokeRoundedLayoutGrid
+                : HugeIcons.strokeRoundedLayoutLeft,
+            size: 22,
             color: AppColors.primary,
           ),
         ),

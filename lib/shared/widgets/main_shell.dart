@@ -510,8 +510,8 @@ class _ShellBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Container(
-          height: 68,
-          decoration: BoxDecoration(
+          // No fixed height — let SafeArea bottom inset + content size it
+          decoration: const BoxDecoration(
             color: AppColors.white,
             border: Border(
               top: BorderSide(color: AppColors.border, width: 0.8),
@@ -528,8 +528,7 @@ class _ShellBottomNav extends StatelessWidget {
                   onTap: () => context.go(tab.route),
                   splashColor: AppColors.primarySurface,
                   highlightColor: Colors.transparent,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
