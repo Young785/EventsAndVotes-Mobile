@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/providers/ticket_cart_provider.dart';
 import '../../../core/services/events_service.dart';
 import '../../../core/services/tickets_service.dart';
 import '../../../core/services/payment_service.dart';
@@ -36,6 +37,9 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
   void initState() {
     super.initState();
     _load();
+    // Rebuild so button enables/disables as user types
+    _nameCtrl.addListener(() => setState(() {}));
+    _emailCtrl.addListener(() => setState(() {}));
   }
 
   @override
@@ -87,6 +91,13 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
   int get _totalQty =>
       _quantities.values.fold(0, (a, b) => a + b);
 
+  // True when form is ready to submit
+  bool get _canPurchase =>
+      !_purchasing &&
+      _totalQty > 0 &&
+      _nameCtrl.text.trim().isNotEmpty &&
+      _emailCtrl.text.trim().isNotEmpty;
+
   Future<void> _purchase() async {
     if (_event == null || _totalQty == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -131,6 +142,8 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
 
       if (paid) {
         if (!mounted) return;
+        // Update cart badge count
+        context.read<TicketCartProvider>().increment(_totalQty);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Payment successful! Your tickets are ready.'),
@@ -241,7 +254,7 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
                           const SizedBox(height: 16),
                           AppButton(
                             label: _purchasing ? 'Processing...' : 'Continue to Payment',
-                            onTap: _purchasing ? null : _purchase,
+                            onTap: _canPurchase ? _purchase : null,
                             isLoading: _purchasing,
                           ),
                           const SizedBox(height: 32),

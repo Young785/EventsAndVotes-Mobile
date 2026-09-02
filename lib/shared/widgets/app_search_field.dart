@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../core/theme/app_theme.dart';
 
 class AppSearchField extends StatelessWidget {
@@ -6,6 +7,7 @@ class AppSearchField extends StatelessWidget {
   final String hint;
   final ValueChanged<String>? onSubmitted;
   final VoidCallback? onClear;
+  final ValueChanged<String>? onChanged;
 
   const AppSearchField({
     super.key,
@@ -13,26 +15,65 @@ class AppSearchField extends StatelessWidget {
     required this.hint,
     this.onSubmitted,
     this.onClear,
+    this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    final defaults = Theme.of(context).inputDecorationTheme;
-
-    return TextField(
-      controller: controller,
-      onSubmitted: onSubmitted,
-      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textHint, size: 20),
-        suffixIcon: onClear != null
-            ? IconButton(
-                icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.textHint),
-                onPressed: onClear,
-              )
-            : null,
-      ).applyDefaults(defaults),
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        onSubmitted: onSubmitted,
+        onChanged: onChanged,
+        textAlignVertical: TextAlignVertical.center,
+        style: const TextStyle(
+          fontSize: 14,
+          color: AppColors.textPrimary,
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            fontSize: 14,
+            color: AppColors.textHint,
+          ),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(12),
+            child: HugeIcon(
+              icon: HugeIcons.strokeRoundedSearch01,
+              color: AppColors.textHint,
+              size: 20,
+            ),
+          ),
+          suffixIcon: onClear != null
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: AppColors.textHint,
+                  ),
+                  onPressed: onClear,
+                )
+              : null,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+          isDense: true,
+        ),
+      ),
     );
   }
 }

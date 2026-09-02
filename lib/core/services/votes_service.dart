@@ -57,4 +57,34 @@ class VotesService {
       throw Exception('Failed to submit vote: $e');
     }
   }
+
+  /// Returns the authenticated user's vote purchase / cast history.
+  Future<List<Map<String, dynamic>>> getMyVoteTransactions({
+    int page = 1,
+  }) async {
+    try {
+      final response = await _apiClient.get(
+        '/votes/my-votes',
+        params: {'page': page},
+      );
+      final data = response.data;
+      // Handle { data: [...] } or { data: { data: [...] } }
+      dynamic payload = data;
+      if (payload is Map && payload.containsKey('data')) {
+        payload = payload['data'];
+      }
+      if (payload is Map && payload.containsKey('data')) {
+        payload = payload['data'];
+      }
+      if (payload is List) {
+        return payload
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to load vote transactions: $e');
+    }
+  }
 }

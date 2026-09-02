@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/votes_service.dart';
@@ -11,6 +12,7 @@ import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/app_search_field.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/layout_view_toggle.dart';
+import '../../../shared/widgets/transactions_sheet.dart';
 import '../../../core/theme/app_spacing.dart';
 
 class VotesListScreen extends StatefulWidget {
@@ -137,7 +139,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
             else
               _gridView
                   ? SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                       sliver: SliverGrid(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -164,7 +166,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
                       ),
                     )
                   : SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                       sliver: SliverList.separated(
                         itemCount: _votes.length + (_page < _lastPage ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -187,6 +189,33 @@ class _VotesListScreenState extends State<VotesListScreen> {
                         },
                       ),
                     ),
+            // ── Transactions button footer ──────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                child: OutlinedButton.icon(
+                  onPressed: () => TransactionsSheet.show(
+                    context,
+                    type: TransactionType.votes,
+                  ),
+                  icon: HugeIcon(
+                    icon: HugeIcons.strokeRoundedCheckList,
+                    color: AppColors.primary,
+                    size: 18,
+                  ),
+                  label: const Text('View Vote Transactions'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(
+                        color: AppColors.primary, width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -196,50 +225,56 @@ class _VotesListScreenState extends State<VotesListScreen> {
   Widget _buildFilters() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      child: Column(
+      child: Row(
         children: [
-          AppSearchField(
-            controller: _searchCtrl,
-            hint: 'Search elections...',
-            onSubmitted: (v) {
-              _search = v;
-              _load();
-            },
-            onClear: _search.isNotEmpty
-                ? () {
-                    _searchCtrl.clear();
-                    setState(() => _search = '');
-                    _load();
-                  }
-                : null,
+          // ── Search field (flexible, takes remaining space) ─────────
+          Expanded(
+            child: AppSearchField(
+              controller: _searchCtrl,
+              hint: 'Search elections...',
+              onSubmitted: (v) {
+                _search = v;
+                _load();
+              },
+              onChanged: (v) {
+                if (v.isEmpty && _search.isNotEmpty) {
+                  setState(() => _search = '');
+                  _load();
+                }
+              },
+              onClear: _search.isNotEmpty
+                  ? () {
+                      _searchCtrl.clear();
+                      setState(() => _search = '');
+                      _load();
+                    }
+                  : null,
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 38,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _tabs.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (_, i) => _FilterChip(
-                      label: _tabs[i],
-                      active: (_status == '' && _tabs[i] == 'All') ||
-                          (_status == 'STARTED' && _tabs[i] == 'Active') ||
-                          (_status == 'COMPLETED' && _tabs[i] == 'Completed') ||
-                          (_status == 'INACTIVE' && _tabs[i] == 'Upcoming'),
-                      onTap: () => _setStatus(_tabs[i]),
-                    ),
-                  ),
-                ),
+          const SizedBox(width: 10),
+          // ── Filter chips horizontal scroll ─────────────────────────
+          SizedBox(
+            height: 48,
+            child: ListView.separated(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: _tabs.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              itemBuilder: (_, i) => _FilterChip(
+                label: _tabs[i],
+                active: (_status == '' && _tabs[i] == 'All') ||
+                    (_status == 'STARTED' && _tabs[i] == 'Active') ||
+                    (_status == 'COMPLETED' && _tabs[i] == 'Completed') ||
+                    (_status == 'INACTIVE' && _tabs[i] == 'Upcoming'),
+                onTap: () => _setStatus(_tabs[i]),
               ),
-              const SizedBox(width: 10),
-              LayoutViewToggle(
-                isGrid: _gridView,
-                onChanged: (v) => setState(() => _gridView = v),
-              ),
-            ],
+            ),
+          ),
+          const SizedBox(width: 6),
+          // ── Grid/list toggle ───────────────────────────────────────
+          LayoutViewToggle(
+            isGrid: _gridView,
+            onChanged: (v) => setState(() => _gridView = v),
           ),
         ],
       ),
@@ -492,19 +527,23 @@ class _FilterChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary : AppColors.white,
+          // Active = white bg with primary border; inactive = background with faint border
+          color: active ? AppColors.white : AppColors.background,
           borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-          border: Border.all(color: active ? AppColors.primary : AppColors.border),
+          border: Border.all(
+            color: active ? AppColors.primary : AppColors.border,
+            width: active ? 1.8 : 1,
+          ),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: active ? Colors.white : AppColors.textSecondary,
+            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+            color: active ? AppColors.primary : AppColors.textSecondary,
           ),
         ),
       ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -18,6 +19,7 @@ import '../../../features/auth/providers/auth_provider.dart';
 import '../models/ticket_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/ticket_qr_image.dart';
+import '../../../shared/widgets/transactions_sheet.dart';
 
 class MyTicketsScreen extends StatefulWidget {
   const MyTicketsScreen({super.key});
@@ -138,15 +140,46 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                       parent: BouncingScrollPhysics(),
                     ),
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    itemCount: _tickets.length,
-                    itemBuilder: (_, i) => Padding(
-                      padding: const EdgeInsets.only(bottom: 28),
-                      child: _WalletPassCard(
-                        ticket: _tickets[i],
-                        onShowQr: () => _showQrSheet(_tickets[i]),
-                        token: auth.token,
-                      ).animate().fadeIn(delay: (i * 50).ms),
-                    ),
+                    itemCount: _tickets.length + 1, // +1 for transactions btn
+                    itemBuilder: (_, i) {
+                      // Last item: Transactions button
+                      if (i == _tickets.length) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8, bottom: 16),
+                          child: OutlinedButton.icon(
+                            onPressed: () => TransactionsSheet.show(
+                              context,
+                              type: TransactionType.tickets,
+                              token: auth.token,
+                            ),
+                            icon: HugeIcon(
+                              icon: HugeIcons.strokeRoundedTicket01,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
+                            label: const Text('View Ticket Transactions'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primary,
+                              side: const BorderSide(
+                                  color: AppColors.primary, width: 1.5),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 28),
+                        child: _WalletPassCard(
+                          ticket: _tickets[i],
+                          onShowQr: () => _showQrSheet(_tickets[i]),
+                          token: auth.token,
+                        ).animate().fadeIn(delay: (i * 50).ms),
+                      );
+                    },
                   ),
       ),
     );
@@ -209,7 +242,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
-        SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.22),
         const Center(
           child: Column(
             children: [
@@ -221,6 +254,29 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
               Text('Purchase event tickets to see them here',
                   style: AppTextStyles.bodyMedium),
             ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: OutlinedButton.icon(
+            onPressed: () => TransactionsSheet.show(
+              context,
+              type: TransactionType.tickets,
+            ),
+            icon: HugeIcon(
+              icon: HugeIcons.strokeRoundedTicket01,
+              color: AppColors.primary,
+              size: 18,
+            ),
+            label: const Text('View Transaction History'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary, width: 1.5),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
           ),
         ),
       ],

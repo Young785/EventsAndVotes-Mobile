@@ -203,72 +203,80 @@ class _EventsScreenState extends State<EventsScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      child: Column(
+      child: Row(
         children: [
-          AppSearchField(
-            controller: _searchCtrl,
-            hint: 'Search events...',
-            onSubmitted: (v) {
-              _search = v;
-              _load();
-            },
-            onClear: _search.isNotEmpty
-                ? () {
-                    _searchCtrl.clear();
-                    setState(() => _search = '');
-                    _load();
-                  }
-                : null,
+          // ── Search field ───────────────────────────────────────────
+          Expanded(
+            child: AppSearchField(
+              controller: _searchCtrl,
+              hint: 'Search events...',
+              onSubmitted: (v) {
+                _search = v;
+                _load();
+              },
+              onChanged: (v) {
+                if (v.isEmpty && _search.isNotEmpty) {
+                  setState(() => _search = '');
+                  _load();
+                }
+              },
+              onClear: _search.isNotEmpty
+                  ? () {
+                      _searchCtrl.clear();
+                      setState(() => _search = '');
+                      _load();
+                    }
+                  : null,
+            ),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: 38,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _tabs.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (_, i) {
-                      final active = _status == (map[_tabs[i]] ?? '');
-                      return GestureDetector(
-                        onTap: () => _setStatus(_tabs[i]),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: active ? AppColors.primary : AppColors.white,
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.chipRadius),
-                            border: Border.all(
-                              color: active ? AppColors.primary : AppColors.border,
-                            ),
-                          ),
-                          child: Text(
-                            _tabs[i],
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color:
-                                  active ? Colors.white : AppColors.textSecondary,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+          const SizedBox(width: 10),
+          // ── Filter chips ───────────────────────────────────────────
+          SizedBox(
+            height: 48,
+            child: ListView.separated(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: _tabs.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              itemBuilder: (_, i) {
+                final active = _status == (map[_tabs[i]] ?? '');
+                return GestureDetector(
+                  onTap: () => _setStatus(_tabs[i]),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: active ? AppColors.white : AppColors.background,
+                      borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      border: Border.all(
+                        color: active ? AppColors.primary : AppColors.border,
+                        width: active ? 1.8 : 1,
+                      ),
+                    ),
+                    child: Text(
+                      _tabs[i],
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight:
+                            active ? FontWeight.w700 : FontWeight.w500,
+                        color: active
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              LayoutViewToggle(
-                isGrid: _gridView,
-                onChanged: (v) => setState(() => _gridView = v),
-              ),
-            ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 6),
+          // ── Grid/list toggle ───────────────────────────────────────
+          LayoutViewToggle(
+            isGrid: _gridView,
+            onChanged: (v) => setState(() => _gridView = v),
           ),
         ],
       ),

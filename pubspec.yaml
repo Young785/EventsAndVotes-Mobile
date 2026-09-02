@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.7.2 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -21,7 +21,7 @@ dependencies:
 
   # Storage
   shared_preferences: ^2.2.3
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^8.0.0
 
   # Navigation
   go_router: ^13.2.0
@@ -42,11 +42,11 @@ dependencies:
   intl: ^0.19.0
   timeago: ^3.6.1
   url_launcher: ^6.2.6
-  share_plus: ^9.0.0
-  image_picker: ^1.1.2
+  share_plus: ^7.2.2
+  image_picker: ^1.0.7
   permission_handler: ^11.3.1
-  mobile_scanner: ^6.0.2
-  webview_flutter: ^4.10.0
+  mobile_scanner: ^4.0.1
+  webview_flutter: ^4.4.2
 
   # PDF & File sharing
   pdf: ^3.11.0
@@ -55,10 +55,23 @@ dependencies:
   # Animations
   flutter_animate: ^4.5.0
 
+  # Icons
+  hugeicons: 1.1.7
+
+dependency_overrides:
+  win32: 5.13.0
+  flutter_plugin_android_lifecycle: 2.0.31
+  image_picker_android: 0.8.13+1
+  path_provider_android: 2.2.19
+  shared_preferences_android: 2.4.13
+  sqflite: 2.4.2
+  url_launcher_android: 6.3.20
+  webview_flutter_android: 4.10.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
 
 flutter:

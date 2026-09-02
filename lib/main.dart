@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
+import 'core/providers/ticket_cart_provider.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/scanner/providers/scanner_session_provider.dart';
 import 'shared/widgets/app_pop_scope.dart';
@@ -24,6 +25,7 @@ void main() async {
 
   final authProvider = AuthProvider();
   final scannerProvider = ScannerSessionProvider();
+  final ticketCartProvider = TicketCartProvider();
   await authProvider.initialize();
   await scannerProvider.initialize();
 
@@ -32,6 +34,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: scannerProvider),
+        ChangeNotifierProvider.value(value: ticketCartProvider),
       ],
       child: const EventsVotesApp(),
     ),
@@ -56,10 +59,22 @@ class _EventsVotesAppState extends State<EventsVotesApp> {
     _authProvider = context.read<AuthProvider>();
     _scannerProvider = context.read<ScannerSessionProvider>();
     _routerWrapper = GoRouterWrapper(_authProvider, _scannerProvider);
+    // Seed the ticket count once auth resolves
+    _authProvider.addListener(_onAuthChanged);
+  }
+
+  void _onAuthChanged() {
+    final cart = context.read<TicketCartProvider>();
+    if (_authProvider.isAuthenticated) {
+      cart.refresh();
+    } else {
+      cart.reset();
+    }
   }
 
   @override
   void dispose() {
+    _authProvider.removeListener(_onAuthChanged);
     _routerWrapper.dispose();
     _scannerProvider.disposeMigration();
     super.dispose();

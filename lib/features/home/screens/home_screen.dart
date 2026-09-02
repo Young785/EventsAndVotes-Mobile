@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
@@ -213,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     actionRoute: '/events',
                   ),
                   _buildEventsSection(),
-                  _buildHowItWorks(),
+                  // _buildHowItWorks(),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -228,9 +229,9 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_loading || _heroSlides.isEmpty) {
       return Container(
         margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-        height: 210,
+        height: 138,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(16),
           color: AppColors.primarySurface,
         ),
         child: const Center(
@@ -248,9 +249,9 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-          height: 210,
+          height: 138,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(16),
             color: Colors.black,
             boxShadow: [
               BoxShadow(
@@ -293,15 +294,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Hello, $firstName 👋',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.88),
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -334,20 +336,20 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 6),
                           Text(
                             slide.heading,
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.w800,
                               height: 1.15,
                               letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
                               _heroBtn(
@@ -403,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
         decoration: BoxDecoration(
           color: filled ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
@@ -413,7 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
           label,
           style: TextStyle(
             color: filled ? AppColors.primary : Colors.white,
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -425,77 +427,86 @@ class _HomeScreenState extends State<HomeScreen> {
     final voteCount = _platformStats['votes'] as int? ?? _votes.length;
     final eventCount = _platformStats['events'] as int? ?? _events.length;
     final castCount =
-        _platformStats['total_votes_cast'] as int? ??
-        _sumVoteCounts(_votes);
+        _platformStats['total_votes_cast'] as int? ?? _sumVoteCounts(_votes);
 
     final stats = [
       {
         'value': _formatStatCount(voteCount),
         'label': 'Active Votes',
-        'icon': Icons.how_to_vote_outlined,
+        'icon': HugeIcons.strokeRoundedCheckList,
       },
       {
         'value': _formatStatCount(eventCount),
         'label': 'Events',
-        'icon': Icons.event_outlined,
+        'icon': HugeIcons.strokeRoundedCalendar03,
       },
       {
         'value': _formatStatCount(castCount),
         'label': 'Votes Cast',
-        'icon': Icons.bar_chart_rounded,
+        'icon': HugeIcons.strokeRoundedBarChart,
       },
       {
         'value': _formatStatCount(voteCount + eventCount),
         'label': 'Opportunities',
-        'icon': Icons.explore_outlined,
+        'icon': HugeIcons.strokeRoundedCompass,
       },
     ];
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       child: Row(
-        children:
-            stats
-                .map(
-                  (s) => Expanded(
-                    child: Column(
-                      children: [
-                        Icon(
-                          s['icon'] as IconData,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          s['value'] as String,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          s['label'] as String,
-                          style: AppTextStyles.labelSmall,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+        children: stats.asMap().entries.map((entry) {
+          final i = entry.key;
+          final s = entry.value;
+          return Expanded(
+            child: Container(
+              margin: EdgeInsets.only(right: i < 3 ? 8 : 0),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HugeIcon(
+                    icon: s['icon'] as List<List<dynamic>>,
+                    color: AppColors.primary,
+                    size: 22,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    s['value'] as String,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
                     ),
                   ),
-                )
-                .toList(),
+                  const SizedBox(height: 2),
+                  Text(
+                    s['label'] as String,
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     ).animate().fadeIn(delay: 100.ms, duration: 400.ms);
   }
@@ -514,7 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     if (_votes.isEmpty) {
-      return _emptyState('No votes available', Icons.how_to_vote_outlined);
+      return _emptyState('No votes available', HugeIcons.strokeRoundedCheckList);
     }
     return SizedBox(
       height: 180,
@@ -541,7 +552,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     if (_events.isEmpty) {
-      return _emptyState('No events available', Icons.event_outlined);
+      return _emptyState('No events available', HugeIcons.strokeRoundedCalendar03);
     }
     return ListView.separated(
       shrinkWrap: true,
@@ -634,8 +645,8 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: const Icon(
-              Icons.monetization_on_rounded,
+            child: HugeIcon(
+              icon: HugeIcons.strokeRoundedCoins01,
               color: Colors.white,
               size: 32,
             ),
@@ -645,104 +656,23 @@ class _HomeScreenState extends State<HomeScreen> {
     ).animate().fadeIn(delay: 200.ms, duration: 400.ms);
   }
 
-  Widget _buildHowItWorks() {
-    final steps = [
-      {
-        'icon': Icons.search_rounded,
-        'title': 'Discover',
-        'desc': 'Find events & votes near you',
-      },
-      {
-        'icon': Icons.how_to_vote_rounded,
-        'title': 'Participate',
-        'desc': 'Cast votes & buy tickets',
-      },
-      {
-        'icon': Icons.monetization_on_rounded,
-        'title': 'Earn',
-        'desc': 'Refer friends & earn cash',
-      },
-    ];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
-          child: Text('How It Works', style: AppTextStyles.headlineMedium),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children:
-                steps
-                    .asMap()
-                    .entries
-                    .map(
-                      (e) => Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(right: e.key < 2 ? 10 : 0),
-                          child: Container(
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: AppColors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: AppColors.border),
-                            ),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primarySurface,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Icon(
-                                    e.value['icon'] as IconData,
-                                    color: AppColors.primary,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  e.value['title'] as String,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  e.value['desc'] as String,
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppColors.textSecondary,
-                                    height: 1.3,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-          ),
-        ),
-      ],
-    );
-  }
+  // ── How It Works (commented out) ──────────────────────────────────────────
+  // Widget _buildHowItWorks() {
+  //   final steps = [
+  //     {'icon': Icons.search_rounded, 'title': 'Discover', 'desc': 'Find events & votes near you'},
+  //     {'icon': Icons.how_to_vote_rounded, 'title': 'Participate', 'desc': 'Cast votes & buy tickets'},
+  //     {'icon': Icons.monetization_on_rounded, 'title': 'Earn', 'desc': 'Refer friends & earn cash'},
+  //   ];
+  //   return Column( ... );
+  // }
 
-  Widget _emptyState(String msg, IconData icon) {
+  Widget _emptyState(String msg, List<List<dynamic>> icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Center(
         child: Column(
           children: [
-            Icon(icon, size: 40, color: AppColors.textHint),
+            HugeIcon(icon: icon, size: 40, color: AppColors.textHint),
             const SizedBox(height: 8),
             Text(
               msg,
@@ -788,10 +718,12 @@ class _VoteCard extends StatelessWidget {
                     errorWidget:
                         (_, __, ___) => Container(
                           color: AppColors.primarySurface,
-                          child: const Icon(
-                            Icons.how_to_vote_rounded,
-                            color: AppColors.primary,
-                            size: 32,
+                          child: Center(
+                            child: HugeIcon(
+                              icon: HugeIcons.strokeRoundedCheckList,
+                              color: AppColors.primary,
+                              size: 32,
+                            ),
                           ),
                         ),
                   ),
@@ -821,8 +753,8 @@ class _VoteCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.people_outline_rounded,
+                      HugeIcon(
+                        icon: HugeIcons.strokeRoundedUserGroup,
                         size: 12,
                         color: AppColors.textSecondary,
                       ),
@@ -906,10 +838,12 @@ class _EventCard extends StatelessWidget {
                 errorWidget:
                     (_, __, ___) => Container(
                       color: AppColors.primarySurface,
-                      child: const Icon(
-                        Icons.event_rounded,
-                        color: AppColors.primary,
-                        size: 28,
+                      child: Center(
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedCalendar03,
+                          color: AppColors.primary,
+                          size: 28,
+                        ),
                       ),
                     ),
               ),
@@ -933,8 +867,8 @@ class _EventCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.location_on_outlined,
+                        HugeIcon(
+                          icon: HugeIcons.strokeRoundedLocation01,
                           size: 12,
                           color: AppColors.textSecondary,
                         ),
@@ -955,8 +889,8 @@ class _EventCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.calendar_today_outlined,
+                        HugeIcon(
+                          icon: HugeIcons.strokeRoundedCalendar03,
                           size: 12,
                           color: AppColors.textSecondary,
                         ),
