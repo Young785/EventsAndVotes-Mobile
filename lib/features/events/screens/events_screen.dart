@@ -203,41 +203,50 @@ class _EventsScreenState extends State<EventsScreen> {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Search field ───────────────────────────────────────────
-          Expanded(
-            child: AppSearchField(
-              controller: _searchCtrl,
-              hint: 'Search events...',
-              onSubmitted: (v) {
-                _search = v;
-                _load();
-              },
-              onChanged: (v) {
-                if (v.isEmpty && _search.isNotEmpty) {
-                  setState(() => _search = '');
-                  _load();
-                }
-              },
-              onClear: _search.isNotEmpty
-                  ? () {
-                      _searchCtrl.clear();
+          // ── Row 1: Search bar + grid/list toggle ───────────────────
+          Row(
+            children: [
+              Expanded(
+                child: AppSearchField(
+                  controller: _searchCtrl,
+                  hint: 'Search events...',
+                  onSubmitted: (v) {
+                    _search = v;
+                    _load();
+                  },
+                  onChanged: (v) {
+                    if (v.isEmpty && _search.isNotEmpty) {
                       setState(() => _search = '');
                       _load();
                     }
-                  : null,
-            ),
+                  },
+                  onClear: _search.isNotEmpty
+                      ? () {
+                          _searchCtrl.clear();
+                          setState(() => _search = '');
+                          _load();
+                        }
+                      : null,
+                ),
+              ),
+              const SizedBox(width: 10),
+              LayoutViewToggle(
+                isGrid: _gridView,
+                onChanged: (v) => setState(() => _gridView = v),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          // ── Filter chips ───────────────────────────────────────────
+          const SizedBox(height: 10),
+          // ── Row 2: Filter chips full width ─────────────────────────
           SizedBox(
-            height: 48,
+            height: 38,
             child: ListView.separated(
-              shrinkWrap: true,
               scrollDirection: Axis.horizontal,
               itemCount: _tabs.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 6),
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
               itemBuilder: (_, i) {
                 final active = _status == (map[_tabs[i]] ?? '');
                 return GestureDetector(
@@ -250,9 +259,11 @@ class _EventsScreenState extends State<EventsScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: active ? AppColors.white : AppColors.background,
-                      borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.chipRadius),
                       border: Border.all(
-                        color: active ? AppColors.primary : AppColors.border,
+                        color:
+                            active ? AppColors.primary : AppColors.border,
                         width: active ? 1.8 : 1,
                       ),
                     ),
@@ -271,12 +282,6 @@ class _EventsScreenState extends State<EventsScreen> {
                 );
               },
             ),
-          ),
-          const SizedBox(width: 6),
-          // ── Grid/list toggle ───────────────────────────────────────
-          LayoutViewToggle(
-            isGrid: _gridView,
-            onChanged: (v) => setState(() => _gridView = v),
           ),
         ],
       ),
