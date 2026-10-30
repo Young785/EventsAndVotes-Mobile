@@ -18,6 +18,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { useAuditLogger } from '../hooks/useAuditLogger'
 import { activityLogsApi } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 
 interface ActivityLogItem {
     id: number
@@ -60,6 +61,8 @@ interface ActivityStats {
 }
 
 const AdminActivityLogs: React.FC = () => {
+    const { user } = useAuth()
+    const isSuperAdmin = user?.role?.name === 'superadmin'
     const [filter, setFilter] = useState({
         log_name: 'all',
         date_from: '',
@@ -88,7 +91,8 @@ const AdminActivityLogs: React.FC = () => {
     } = useQuery({
         queryKey: ['admin-activity-logs', filter],
         queryFn: () => activityLogsApi.getAll(filter),
-        refetchInterval: 30000
+        enabled: isSuperAdmin,
+        refetchInterval: isSuperAdmin ? 30000 : false
     })
 
     // Fetch activity statistics
@@ -99,8 +103,8 @@ const AdminActivityLogs: React.FC = () => {
     } = useQuery({
         queryKey: ['admin-activity-stats'],
         queryFn: () => activityLogsApi.getStats(),
-        enabled: showStats,
-        refetchInterval: 60000
+        enabled: showStats && isSuperAdmin,
+        refetchInterval: isSuperAdmin ? 60000 : false
     })
 
     // Log component mount and filter changes
@@ -224,6 +228,15 @@ const AdminActivityLogs: React.FC = () => {
                         </span>
                     </div>
                 ))}
+            </div>
+        )
+    }
+
+    if (!isSuperAdmin) {
+        return (
+            <div className="p-8 text-center">
+                <h1 className="text-xl font-semibold text-gray-900">Access denied</h1>
+                <p className="mt-2 text-gray-600">Activity logs are available to superadmin only.</p>
             </div>
         )
     }

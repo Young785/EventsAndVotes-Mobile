@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Activity, User, Vote, CreditCard, AlertCircle, Clock, Filter, Eye, Shield, Settings } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuditLogger } from '../hooks/useAuditLogger'
+import { useAuth } from '../contexts/AuthContext'
 
 interface ActivityItem {
     id: number
@@ -100,6 +101,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     apiEndpoint,
     context = 'ActivityFeed'
 }) => {
+    const { user } = useAuth()
+    const isSuperAdmin = user?.role?.name === 'superadmin'
     const [filter, setFilter] = useState<'all' | 'user' | 'vote' | 'payment' | 'system' | 'authentication' | 'security'>('all')
     const [showDetails, setShowDetails] = useState<number | null>(null)
 
@@ -109,7 +112,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     const { data: activities, isLoading, error } = useQuery({
         queryKey: ['activity-feed', filter],
         queryFn: apiEndpoint || (() => Promise.resolve({ data: mockActivities })),
-        refetchInterval: 30000 // Refetch every 30 seconds
+        enabled: isSuperAdmin,
+        refetchInterval: isSuperAdmin ? 30000 : false
     })
 
     // Log component interactions
@@ -210,6 +214,10 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     const handleViewAllClick = () => {
         logButtonClick('view_all_activities')
         // Navigate to full activity logs page
+    }
+
+    if (!isSuperAdmin) {
+        return null
     }
 
     if (error) {

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import apiConfig from '../config/api.config'
+import { isCurrentUserSuperAdmin, isRestrictedLogRequest } from '../utils/access'
 import {
     User,
     LoginCredentials,
@@ -44,6 +45,9 @@ const api: AxiosInstance = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
     (config) => {
+        if (isRestrictedLogRequest(config.url) && !isCurrentUserSuperAdmin()) {
+            return Promise.reject(new Error('Activity and audit logs are restricted to superadmin'))
+        }
         const token = localStorage.getItem('token')
         if (token) {
             config.headers.Authorization = `Bearer ${token}`
@@ -776,7 +780,13 @@ export const notificationsApi = {
     },
 }
 
-// Activity Logs API
+function requireSuperAdminLogAccess(): void {
+    if (!isCurrentUserSuperAdmin()) {
+        throw new Error('Activity and audit logs are restricted to superadmin')
+    }
+}
+
+// Activity Logs API — superadmin only
 export const activityLogsApi = {
     // Get activity logs with filtering and pagination
     getAll: async (params?: {
@@ -797,11 +807,13 @@ export const activityLogsApi = {
         if (params?.page) searchParams.append('page', params.page.toString())
         if (params?.per_page) searchParams.append('per_page', params.per_page.toString())
 
+        requireSuperAdminLogAccess()
         return api.get(`/admin/activity-logs?${searchParams.toString()}`)
     },
 
     // Get activity statistics
     getStats: async (): Promise<ApiResponse<ActivityLogStats>> => {
+        requireSuperAdminLogAccess()
         return api.get('/admin/activity-logs/stats')
     },
 
@@ -818,6 +830,7 @@ export const activityLogsApi = {
         if (params?.date_from) searchParams.append('date_from', params.date_from)
         if (params?.date_to) searchParams.append('date_to', params.date_to)
 
+        requireSuperAdminLogAccess()
         if (params?.format === 'csv') {
             const response = await axios.get(
                 `/admin/activity-logs/export?${searchParams.toString()}`,

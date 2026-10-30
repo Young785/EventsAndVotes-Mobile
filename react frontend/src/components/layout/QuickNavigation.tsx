@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Command, ArrowRight, Clock, Star, Users, BarChart, Settings, FileText, CreditCard } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface NavigationItem {
     id: string;
@@ -24,6 +25,8 @@ const QuickNavigation: React.FC<QuickNavigationProps> = ({ isOpen, onClose }) =>
     const [recentItems, setRecentItems] = useState<string[]>([]);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const isSuperAdmin = user?.role?.name === 'superadmin';
 
     const navigationItems: NavigationItem[] = [
         // Dashboard & Overview
@@ -191,7 +194,7 @@ const QuickNavigation: React.FC<QuickNavigationProps> = ({ isOpen, onClose }) =>
             id: 'activity-logs',
             title: 'Activity Logs',
             description: 'System activity and audit trail',
-            path: '/activity-logs',
+            path: '/admin/activity-logs',
             icon: <Clock className="w-4 h-4" />,
             category: 'Settings',
             keywords: ['audit', 'logs', 'history', 'activity', 'tracking']
@@ -210,6 +213,7 @@ const QuickNavigation: React.FC<QuickNavigationProps> = ({ isOpen, onClose }) =>
     ];
 
     const filteredItems = navigationItems.filter(item => {
+        if (item.id === 'activity-logs' && !isSuperAdmin) return false;
         if (!searchTerm) return true;
 
         const searchLower = searchTerm.toLowerCase();

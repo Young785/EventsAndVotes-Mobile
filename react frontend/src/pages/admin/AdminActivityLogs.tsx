@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { adminApi } from '../../services/api'
 import { ActivityLog, ActivityLogStats } from '../../types'
+import { useAuth } from '../../contexts/AuthContext'
 import AdminLayout from '../../components/AdminLayout'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import toast from 'react-hot-toast'
@@ -28,6 +29,8 @@ import { formatDistanceToNow, format } from 'date-fns'
 import { getNomineeImageUrl } from '../../utils/imageUtils'
 
 const AdminActivityLogs: React.FC = () => {
+    const { user } = useAuth()
+    const isSuperAdmin = user?.role?.name === 'superadmin'
     const [searchQuery, setSearchQuery] = useState('')
     const [logNameFilter, setLogNameFilter] = useState('')
     const [startDate, setStartDate] = useState('')
@@ -44,14 +47,15 @@ const AdminActivityLogs: React.FC = () => {
             log_name: logNameFilter,
             start_date: startDate,
             end_date: endDate
-        })
+        }),
+        enabled: isSuperAdmin
     })
 
     // Fetch activity statistics
     const { data: statsData } = useQuery({
         queryKey: ['activity-stats'],
         queryFn: () => adminApi.getActivityStats({ days: 30 }),
-        enabled: showStats
+        enabled: showStats && isSuperAdmin
     })
 
     // Export logs mutation
@@ -140,7 +144,14 @@ const AdminActivityLogs: React.FC = () => {
         }
     }
 
-
+    if (!isSuperAdmin) {
+        return (
+            <div className="p-8 text-center">
+                <h1 className="text-xl font-semibold text-gray-900">Access denied</h1>
+                <p className="mt-2 text-gray-600">Activity logs are available to superadmin only.</p>
+            </div>
+        )
+    }
 
     return (
         <div className="p-6">

@@ -1,4 +1,4 @@
-interface AuditEvent {
+import { isCurrentUserSuperAdmin } from './access'
     type: 'user_action' | 'api_call' | 'navigation' | 'error' | 'performance'
     action: string
     details?: Record<string, any>
@@ -141,7 +141,7 @@ class AuditLogger {
             timestamp: new Date().toISOString(),
             userId: this.userId,
             sessionId: this.sessionId,
-            url: window.location.href,
+            url: window.location.pathname,
             userAgent: navigator.userAgent,
             metadata
         }
@@ -235,7 +235,11 @@ class AuditLogger {
         if (!details) return undefined
 
         const sanitized = { ...details }
-        const sensitiveKeys = ['password', 'token', 'secret', 'key', 'credit_card', 'ssn', 'email']
+        const sensitiveKeys = [
+            'password', 'token', 'secret', 'key', 'credit', 'ssn', 'email',
+            'phone', 'otp', 'pin', 'authorization', 'cookie', 'bearer', 'cvv',
+            'account_number', 'bvn',
+        ]
 
         const sanitizeObject = (obj: any): any => {
             if (typeof obj !== 'object' || obj === null) return obj
@@ -262,13 +266,8 @@ class AuditLogger {
     private sanitizeUrl(url: string): string {
         try {
             const urlObj = new URL(url, window.location.origin)
-            // Remove sensitive query parameters
-            const sensitiveParams = ['token', 'key', 'secret', 'password']
-            sensitiveParams.forEach(param => {
-                if (urlObj.searchParams.has(param)) {
-                    urlObj.searchParams.set(param, '[REDACTED]')
-                }
-            })
+            urlObj.search = ''
+            urlObj.hash = ''
             return urlObj.toString()
         } catch {
             return url
@@ -288,14 +287,7 @@ class AuditLogger {
 
         const eventsToSend = [...this.events]
         this.events = []
-
-        // Temporarily disable API calls to prevent connection errors
-        // TODO: Implement /api/audit/frontend endpoint in Laravel backend
-        console.log('Audit events collected (not sent to API):', {
-            sessionId: this.sessionId,
-            eventCount: eventsToSend.length,
-            events: eventsToSend.slice(-5) // Log last 5 events for debugging
-        })
+        if (eventsToSend.length === 0) return
 
         // Original API call code (commented out temporarily)
         /*
@@ -348,6 +340,14 @@ class AuditLogger {
         sessionDuration: number
         lastActivity: string
     } {
+        if (!isCurrentUserSuperAdmin()) {
+            return {
+                sessionId: '',
+                eventCount: 0,
+                sessionDuration: 0,
+                lastActivity: ''
+            }
+        }
         const firstEvent = this.events[0]
         const lastEvent = this.events[this.events.length - 1]
 
@@ -363,6 +363,7 @@ class AuditLogger {
     }
 
     public exportEvents(): AuditEvent[] {
+        if (!isCurrentUserSuperAdmin()) return []
         return [...this.events]
     }
 
