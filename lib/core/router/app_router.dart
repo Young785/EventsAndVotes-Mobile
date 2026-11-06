@@ -31,6 +31,7 @@ import '../../features/scanner/screens/admin_scanner_screen.dart';
 import '../../shared/widgets/main_shell.dart';
 import '../../features/scanner/screens/scanner_portal_screen.dart';
 import '../../features/scanner/screens/scanner_staff_detail_screen.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -68,6 +69,7 @@ bool _requiresUserAuth(String loc) =>
     loc.startsWith('/dashboard') ||
     loc.startsWith('/profile') ||
     loc.startsWith('/my-tickets') ||
+    loc.startsWith('/notifications') ||
     _isVerificationRoute(loc);
 
 Map<int, int> _ticketQuantities(Map<String, String> query) {
@@ -263,6 +265,11 @@ GoRouter createRouter(
           ),
           GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
         ],
+      ),
+      GoRoute(
+        path: '/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (c, s) => const NotificationsScreen(),
       ),
       GoRoute(
         path: '/profile/edit',

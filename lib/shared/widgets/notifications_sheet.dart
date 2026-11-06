@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:go_router/go_router.dart';
 import '../../core/services/notification_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/list_response_utils.dart';
+import 'notification_tile.dart';
 import 'shimmer_card.dart';
 
 class NotificationsSheet extends StatefulWidget {
@@ -32,10 +33,7 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
 
   final _service = NotificationService();
   bool _loading = true;
-  bool _loadingMore = false;
   List<Map<String, dynamic>> _items = [];
-  int _page = 1;
-  int _lastPage = 1;
 
   @override
   void initState() {
@@ -43,30 +41,22 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
     _load(reset: true);
   }
 
-  bool get _hasMore => _page < _lastPage;
-
   Future<void> _load({bool reset = false}) async {
     if (reset) {
-      setState(() {
-        _loading = true;
-        _page = 1;
-      });
+      setState(() => _loading = true);
     }
 
     try {
       final response = await _service.getNotifications(
-        page: _page,
+        page: 1,
         perPage: _pageSize,
       );
       final items = parseListItems(response['data'] as List?);
-      final meta = response['meta'] as Map<String, dynamic>? ?? {};
 
       if (mounted) {
         setState(() {
-          _items = reset ? items : [..._items, ...items];
-          _lastPage = meta['last_page'] ?? meta['total_pages'] ?? 1;
+          _items = items;
           _loading = false;
-          _loadingMore = false;
         });
       }
     } catch (_) {
@@ -74,17 +64,16 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
         setState(() {
           if (reset) _items = [];
           _loading = false;
-          _loadingMore = false;
         });
       }
     }
   }
 
-  Future<void> _loadMore() async {
-    if (_loadingMore || !_hasMore) return;
-    setState(() => _loadingMore = true);
-    _page++;
-    await _load();
+  void _openAll() {
+    final onCountChanged = widget.onCountChanged;
+    final router = GoRouter.of(context);
+    Navigator.pop(context);
+    router.push('/notifications').then((_) => onCountChanged?.call());
   }
 
   Future<void> _markAllRead() async {
@@ -163,7 +152,7 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
                       )
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                        itemCount: _items.length + 1,
+                        itemCount: _items.length + (_items.isEmpty ? 0 : 1),
                         separatorBuilder: (_, index) {
                           if (index >= _items.length - 1) {
                             return const SizedBox(height: 8);
@@ -172,122 +161,24 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
                         },
                         itemBuilder: (_, i) {
                           if (i == _items.length) {
-                            if (!_hasMore) return const SizedBox.shrink();
                             return Padding(
                               padding: const EdgeInsets.only(top: 4, bottom: 8),
                               child: Center(
-                                child: _loadingMore
-                                    ? const SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : OutlinedButton(
-                                        onPressed: _loadMore,
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: AppColors.primary,
-                                          side: const BorderSide(
-                                            color: AppColors.primary,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                        ),
-                                        child: const Text('Load more'),
-                                      ),
+                                child: TextButton(
+                                  onPressed: _openAll,
+                                  child: const Text('View more'),
+                                ),
                               ),
                             );
                           }
 
                           final n = _items[i];
-                          final data = n['data'] is Map
-                              ? Map<String, dynamic>.from(n['data'] as Map)
-                              : <String, dynamic>{};
-                          final title =
-                              data['title']?.toString() ?? 'Notification';
-                          final message = data['message']?.toString() ?? '';
-                          final isUnread = n['read_at'] == null;
-                          final created = n['created_at']?.toString() ?? '';
                           final id = n['id']?.toString() ?? '$i';
+                          final isUnread = n['read_at'] == null;
 
-                          return Material(
-                            color: isUnread
-                                ? AppColors.primary.withValues(alpha: 0.16)
-                                : AppPalette.of(context).raised,
-                            borderRadius: BorderRadius.circular(12),
-                            child: InkWell(
-                              onTap: isUnread ? () => _markRead(id) : null,
-                              borderRadius: BorderRadius.circular(12),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      Icons.notifications_rounded,
-                                      color: isUnread
-                                          ? AppColors.primary
-                                          : AppColors.textHint,
-                                      size: 22,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            title,
-                                            style: TextStyle(
-                                              fontWeight: isUnread
-                                                  ? FontWeight.w700
-                                                  : FontWeight.w500,
-                                              fontSize: 14,
-                                              color: AppPalette.of(context).text,
-                                            ),
-                                          ),
-                                          if (message.isNotEmpty) ...[
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              message,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: AppPalette.of(context).muted,
-                                              ),
-                                            ),
-                                          ],
-                                          if (created.isNotEmpty) ...[
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              timeago.format(
-                                                DateTime.tryParse(created) ??
-                                                    DateTime.now(),
-                                              ),
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                color: AppPalette.of(context).muted,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                    if (isUnread)
-                                      Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.primary,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                          return NotificationTile(
+                            notification: n,
+                            onTap: isUnread ? () => _markRead(id) : null,
                           )
                               .animate()
                               .fadeIn(delay: (i * 30).ms, duration: 250.ms)
