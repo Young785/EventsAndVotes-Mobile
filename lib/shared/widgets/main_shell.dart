@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../core/services/notification_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import 'app_pop_scope.dart';
 import 'notifications_sheet.dart';
 
 class MainShell extends StatelessWidget {
@@ -58,7 +59,8 @@ class MainShell extends StatelessWidget {
 
     final hideHeader = location == '/profile';
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
+    return AppPopScope(
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
       value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: colors.background,
@@ -75,6 +77,7 @@ class MainShell extends StatelessWidget {
           currentIndex: index,
           auth: auth,
         ),
+      ),
       ),
     );
   }

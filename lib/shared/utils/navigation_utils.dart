@@ -38,7 +38,8 @@ void handleAppBack(BuildContext context, {String? fallbackRoute}) {
   _handlingBack = true;
 
   try {
-    final router = GoRouter.of(context);
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return;
     final loc = GoRouterState.of(context).matchedLocation;
 
     // Scanner portal manages its own back stack (tabs).

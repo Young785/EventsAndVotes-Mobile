@@ -15,7 +15,11 @@ class AppPopScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canSlideBack = GoRouter.of(context).canPop();
+    // MaterialApp.builder sits above GoRouter. Don't look the router up there.
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return child;
+
+    final canSlideBack = onBack == null && router.canPop();
     return PopScope(
       canPop: canSlideBack,
       onPopInvokedWithResult: (didPop, _) {

@@ -9,7 +9,6 @@ import 'core/router/app_router.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/scanner/providers/scanner_session_provider.dart';
 import 'shared/widgets/app_loader.dart';
-import 'shared/widgets/app_pop_scope.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -111,13 +110,11 @@ class _EventsVotesAppState extends State<EventsVotesApp> {
               }
               focus.unfocus();
             },
-            child: AppPopScope(
-              child: child ??
-                  const Scaffold(
-                    backgroundColor: Colors.white,
-                    body: Center(child: AppLoader()),
-                  ),
-            ),
+            child: child ??
+                const Scaffold(
+                  backgroundColor: Colors.white,
+                  body: Center(child: AppLoader()),
+                ),
           ),
         );
       },
