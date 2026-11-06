@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _votes = votes.take(6).toList();
-      _events = events.take(6).toList();
+      _events = events.where((event) => !event.hasEnded).take(6).toList();
       _heroSlides = heroSlides;
       _loading = false;
       _refreshing = false;

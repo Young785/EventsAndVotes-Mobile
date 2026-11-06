@@ -41,6 +41,42 @@ class EventModel {
   bool get isActive => status == 'active';
   bool get isUpcoming => status == 'draft';
 
+  /// True when the show is over, even if the API still marks it active.
+  bool get hasEnded {
+    final s = status.toLowerCase();
+    if (s == 'completed' ||
+        s == 'ended' ||
+        s == 'past' ||
+        s == 'expired' ||
+        s == 'cancelled') {
+      return true;
+    }
+    final finish = _finishAt;
+    if (finish == null) return false;
+    return finish.isBefore(DateTime.now());
+  }
+
+  DateTime? get _finishAt {
+    final raw = endDate.isNotEmpty ? endDate : startDate;
+    if (raw.isEmpty) return null;
+    try {
+      var dt = DateTime.parse(raw).toLocal();
+      final clock = (endDate.isNotEmpty ? endTime : startTime)?.trim();
+      final hasClockInDate = raw.contains('T') || raw.contains(':');
+      if (clock != null && clock.isNotEmpty && !hasClockInDate) {
+        final parts = clock.split(':');
+        final hour = int.tryParse(parts[0]) ?? 0;
+        final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+        dt = DateTime(dt.year, dt.month, dt.day, hour, minute);
+      } else if (!hasClockInDate) {
+        dt = DateTime(dt.year, dt.month, dt.day, 23, 59);
+      }
+      return dt;
+    } catch (_) {
+      return null;
+    }
+  }
+
   double get minPrice {
     final active = ticketTiers.where((t) => t.isActive).toList();
     if (active.isEmpty) return 0;

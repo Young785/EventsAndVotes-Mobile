@@ -220,7 +220,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    StatusBadge(status: event.status),
+                    StatusBadge(status: event.hasEnded ? 'ended' : event.status),
                     const SizedBox(height: 14),
                     Row(
                       children: [
@@ -310,7 +310,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       _when(event),
                       style: TextStyle(color: AppPalette.of(context).muted, fontSize: 14),
                     ),
-                    if (event.ticketTiers.isNotEmpty) ...[
+                    if (event.hasEnded) ...[
+                      const SizedBox(height: 18),
+                      _EndedNotice(),
+                    ] else if (event.ticketTiers.isNotEmpty) ...[
                       const SizedBox(height: 18),
                       Text(
                         'Ticket Tier',
@@ -343,21 +346,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         height: 1.45,
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Icon(Icons.verified_user_outlined, color: AppColors.success, size: 16),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Instant digital pass delivery with QR gate admission',
-                            style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13),
+                    if (!event.hasEnded) ...[
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Icon(Icons.verified_user_outlined, color: AppColors.success, size: 16),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Instant digital pass delivery with QR gate admission',
+                              style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    _TierInfoCard(tier: selected),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _TierInfoCard(tier: selected),
+                    ],
                     const SizedBox(height: 22),
                     GestureDetector(
                       onTap: () => context.go('/events'),
@@ -376,7 +381,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ),
           ],
         ),
-        if (activeTiers.isNotEmpty)
+        if (!event.hasEnded && activeTiers.isNotEmpty)
           Positioned(
             left: 16,
             right: 16,
@@ -438,6 +443,34 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _EndedNotice extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: palette.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: palette.border),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.event_busy_rounded, color: palette.muted, size: 22),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'This event has ended. Tickets are no longer on sale.',
+              style: TextStyle(color: palette.text, fontSize: 14, height: 1.35),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

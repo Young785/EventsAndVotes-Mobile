@@ -9,24 +9,23 @@ class DetailBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 8, top: 4),
-        child: Material(
-          color: Colors.black.withValues(alpha: 0.35),
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
-            onTap: onTap ?? () => popPage(context),
-            borderRadius: BorderRadius.circular(12),
-            child: const SizedBox(
-              width: 40,
-              height: 40,
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
+    final reported = MediaQuery.viewPaddingOf(context).top;
+    final top = (reported < 47 ? 59.0 : reported) + 8;
+    return Padding(
+      padding: EdgeInsets.only(left: 16, top: top),
+      child: Material(
+        color: Colors.black.withValues(alpha: 0.45),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap ?? () => popPage(context),
+          child: const SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: Colors.white,
+              size: 18,
             ),
           ),
         ),

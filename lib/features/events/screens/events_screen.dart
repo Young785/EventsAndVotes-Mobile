@@ -63,7 +63,7 @@ class _EventsScreenState extends State<EventsScreen> {
 
     try {
       final response = await _eventsService.getEvents(
-        status: _status.isEmpty ? null : _status,
+        status: _status == 'completed' || _status.isEmpty ? null : _status,
         page: _page,
         search: _search.isEmpty ? null : _search,
       );
@@ -73,7 +73,10 @@ class _EventsScreenState extends State<EventsScreen> {
         final events = <EventModel>[];
         for (final item in items) {
           try {
-            events.add(EventModel.fromJson(item));
+            final event = EventModel.fromJson(item);
+            final showEnded = _status == 'completed';
+            if (showEnded != event.hasEnded) continue;
+            events.add(event);
           } catch (_) {}
         }
         final meta = response['meta'] as Map<String, dynamic>? ?? {};
