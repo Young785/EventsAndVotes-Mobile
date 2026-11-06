@@ -21,6 +21,8 @@ class TicketModel {
   final Color? templatePrimary;
   final Color? templateSecondary;
   final String? backendQrUrl;
+  /// Signed scan payload from the ticket response. This is what the gate QR encodes.
+  final String? qrCodeData;
 
   TicketModel({
     required this.uuid,
@@ -40,6 +42,7 @@ class TicketModel {
     this.templatePrimary,
     this.templateSecondary,
     this.backendQrUrl,
+    this.qrCodeData,
   });
 
   TicketModel copyWith({String? eventPoster}) => TicketModel(
@@ -60,6 +63,7 @@ class TicketModel {
         templatePrimary: templatePrimary,
         templateSecondary: templateSecondary,
         backendQrUrl: backendQrUrl,
+        qrCodeData: qrCodeData,
       );
 
   String get entryCode =>
@@ -168,7 +172,18 @@ class TicketModel {
       templatePrimary: primary,
       templateSecondary: secondary,
       backendQrUrl: TicketsService.qrUrlFromTicketJson(json),
+      qrCodeData: _qrPayload(json),
     );
+  }
+
+  static String? _qrPayload(Map<String, dynamic> json) {
+    for (final key in ['qr_code_data', 'qr_data', 'qr_code']) {
+      final value = json[key]?.toString().trim();
+      if (value == null || value.isEmpty) continue;
+      if (value.startsWith('http://') || value.startsWith('https://')) continue;
+      return value;
+    }
+    return null;
   }
 
   /// Parses a num or numeric string to double without throwing.

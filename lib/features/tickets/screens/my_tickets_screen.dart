@@ -427,6 +427,7 @@ class _WalletPassCard extends StatelessWidget {
                             child: TicketQrImage(
                               ticketUuid: ticket.uuid,
                               authToken: token,
+                              qrData: ticket.qrCodeData,
                               backendQrUrl: ticket.backendQrUrl,
                               size: 62,
                               fit: BoxFit.cover,
@@ -497,61 +498,32 @@ class _WalletPassCard extends StatelessWidget {
     );
   }
 
-  /// Returns a smart placeholder image URL based on the event title keywords.
-  String _placeholderImageUrl() {
+  /// Bundled photo used when the ticket event has no poster.
+  String _placeholderAsset() {
     final title = (ticket.eventTitle ?? '').toLowerCase();
     if (title.contains('music') ||
         title.contains('festival') ||
         title.contains('concert') ||
         title.contains('show') ||
-        title.contains('gig')) {
-      return 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&q=80';
+        title.contains('gig') ||
+        title.contains('night')) {
+      return 'assets/images/login_hero.jpg';
     }
     if (title.contains('tech') ||
-        title.contains('technology') ||
-        title.contains('conference') ||
-        title.contains('summit') ||
         title.contains('workshop') ||
         title.contains('ticket')) {
-      return 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80';
+      return 'assets/images/hero_1.png';
     }
-    if (title.contains('business') ||
-        title.contains('invest') ||
-        title.contains('finance') ||
-        title.contains('fintech')) {
-      return 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=600&q=80';
-    }
-    if (title.contains('sport') ||
-        title.contains('football') ||
-        title.contains('game') ||
-        title.contains('match')) {
-      return 'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=600&q=80';
-    }
-    // generic event fallback
-    return 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80';
+    return 'assets/images/onboarding_events.jpg';
   }
 
   Widget _imageFallback() {
-    final c1 = ticket.templatePrimary ?? AppColors.primary;
-    final c2 = ticket.templateSecondary ?? AppColors.primary;
-    final placeholderUrl = _placeholderImageUrl();
-
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Smart placeholder photo (loads from Unsplash)
-        CachedNetworkImage(
-          imageUrl: placeholderUrl,
+        Image.asset(
+          _placeholderAsset(),
           fit: BoxFit.cover,
-          errorWidget: (_, __, ___) => Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [c1, c2],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
         ),
         // Overlay so text stays readable even over the photo
         Container(
@@ -665,9 +637,15 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
     final service = TicketsService();
     final ticket = widget.ticket;
 
-    // ── 1. Fetch QR bytes (authenticated) ──────────────────────────
+    // ── 1. Draw the QR from the payload on the ticket ──────────────
     Uint8List? qrBytes;
-    if (widget.token != null) {
+    final payload = ticket.qrCodeData;
+    if (payload != null && payload.isNotEmpty) {
+      try {
+        qrBytes = await renderTicketQrPng(payload, size: 300);
+      } catch (_) {}
+    }
+    if (qrBytes == null && widget.token != null) {
       try {
         qrBytes = await service.getQrImageBytes(ticket.uuid, size: 300);
       } catch (_) {}
@@ -988,6 +966,7 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
                 ticketUuid: widget.ticket.uuid,
                 authToken: widget.token,
                 backendQrUrl: widget.ticket.backendQrUrl,
+                qrData: widget.ticket.qrCodeData,
                 size: 190,
               ),
             ),
