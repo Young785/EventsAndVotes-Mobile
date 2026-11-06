@@ -69,7 +69,11 @@ class MainShell extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!hideHeader)
-              _ShellHeader(auth: auth, title: _headerTitle(location)),
+              _ShellHeader(
+                auth: auth,
+                title: _headerTitle(location),
+                showActions: location == '/',
+              ),
             Expanded(child: child),
           ],
         ),
@@ -86,8 +90,13 @@ class MainShell extends StatelessWidget {
 class _ShellHeader extends StatefulWidget {
   final AuthProvider auth;
   final String title;
+  final bool showActions;
 
-  const _ShellHeader({required this.auth, required this.title});
+  const _ShellHeader({
+    required this.auth,
+    required this.title,
+    required this.showActions,
+  });
 
   @override
   State<_ShellHeader> createState() => _ShellHeaderState();
@@ -133,23 +142,17 @@ class _ShellHeaderState extends State<_ShellHeader> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.bolt_rounded,
-                  color: Colors.white,
-                  size: 20,
+              const SizedBox(
+                width: 96,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _BrandMark(),
                 ),
               ),
-              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   widget.title,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
@@ -160,30 +163,99 @@ class _ShellHeaderState extends State<_ShellHeader> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (auth.isAuthenticated)
-                _NotificationBell(
-                  unreadCount: _unreadCount,
-                  onTap: _openNotifications,
-                )
-              else
-                IconButton(
-                  onPressed: () => context.go('/login'),
-                  icon: Icon(
-                    Icons.notifications_none_rounded,
-                    color: AppPalette.of(context).muted,
+              SizedBox(
+                width: 96,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      final slide = Tween<Offset>(
+                        begin: const Offset(0.35, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(position: slide, child: child),
+                      );
+                    },
+                    child: widget.showActions
+                        ? _HeaderActions(
+                            key: const ValueKey('home-actions'),
+                            signedIn: auth.isAuthenticated,
+                            unreadCount: _unreadCount,
+                            onNotifications: auth.isAuthenticated
+                                ? _openNotifications
+                                : () => context.go('/login'),
+                            onProfile: () => context.go(
+                              auth.isAuthenticated ? '/profile' : '/login',
+                            ),
+                          )
+                        : const SizedBox(
+                            key: ValueKey('no-actions'),
+                            width: 96,
+                            height: 40,
+                          ),
                   ),
-                ),
-              const SizedBox(width: 10),
-              _ProfileChip(
-                signedIn: auth.isAuthenticated,
-                onTap: () => context.go(
-                  auth.isAuthenticated ? '/profile' : '/login',
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BrandMark extends StatelessWidget {
+  const _BrandMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: const Icon(
+        Icons.bolt_rounded,
+        color: Colors.white,
+        size: 20,
+      ),
+    );
+  }
+}
+
+class _HeaderActions extends StatelessWidget {
+  final bool signedIn;
+  final int unreadCount;
+  final VoidCallback onNotifications;
+  final VoidCallback onProfile;
+
+  const _HeaderActions({
+    super.key,
+    required this.signedIn,
+    required this.unreadCount,
+    required this.onNotifications,
+    required this.onProfile,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _NotificationBell(
+          unreadCount: unreadCount,
+          onTap: onNotifications,
+        ),
+        const SizedBox(width: 6),
+        _ProfileChip(signedIn: signedIn, onTap: onProfile),
+      ],
     );
   }
 }
@@ -346,12 +418,13 @@ class _ShellBottomNav extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.14)
         : Colors.white.withValues(alpha: 0.8);
 
+    final homeInset = MediaQuery.paddingOf(context).bottom;
+    final bottomGap = homeInset > 20 ? homeInset - 22 : (homeInset > 0 ? homeInset : 8.0);
+
     return Material(
       type: MaterialType.transparency,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+      child: Padding(
+          padding: EdgeInsets.fromLTRB(18, 0, 18, bottomGap),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(32),
             child: BackdropFilter(
@@ -421,7 +494,6 @@ class _ShellBottomNav extends StatelessWidget {
             ),
           ),
         ),
-      ),
     );
   }
 }
