@@ -150,7 +150,7 @@ class _ScannerScanScreenState extends State<ScannerScanScreen>
                     controller: _controller,
                     fit: BoxFit.cover,
                     onDetect: _onDetect,
-                    errorBuilder: (context, error, _) => _CameraMessage(
+                    errorBuilder: (context, error) => _CameraMessage(
                       message: error.errorDetails?.message ??
                           'Could not open the camera.',
                       onRetry: _ensureCamera,

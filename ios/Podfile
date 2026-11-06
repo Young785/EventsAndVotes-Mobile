@@ -1,4 +1,5 @@
 # Uncomment this line to define a global platform for your project
+source 'https://cdn.cocoapods.org/'
 platform :ios, '15.5'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
@@ -42,6 +43,7 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
       config.build_settings['SWIFT_VERSION'] = '5.0'
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
     end
   end
 end

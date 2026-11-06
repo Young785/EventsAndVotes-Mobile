@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constants/app_constants.dart';
 
@@ -38,6 +39,13 @@ class ApiClient {
           handler.next(options);
         },
         onError: (error, handler) {
+          if (kDebugMode) {
+            final status = error.response?.statusCode;
+            final method = error.requestOptions.method;
+            final path = error.requestOptions.uri;
+            debugPrint('[API ERROR] $method $path -> status=$status');
+            debugPrint('[API ERROR] ${error.response?.data ?? error.message}');
+          }
           final status = error.response?.statusCode;
           if (status == 401 || status == 403) {
             final data = error.response?.data;
@@ -50,6 +58,19 @@ class ApiClient {
         },
       ),
     );
+
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        LogInterceptor(
+          requestHeader: true,
+          requestBody: true,
+          responseHeader: false,
+          responseBody: true,
+          error: true,
+          logPrint: (obj) => debugPrint('[API] $obj'),
+        ),
+      );
+    }
   }
 
   static ApiClient get instance {
