@@ -64,7 +64,7 @@ class _PaymentCallbackScreenState extends State<PaymentCallbackScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -74,25 +74,25 @@ class _PaymentCallbackScreenState extends State<PaymentCallbackScreen> {
               if (_loading) ...[
                 const CircularProgressIndicator(color: AppColors.primary),
                 const SizedBox(height: 24),
-                const Text('Verifying payment...',
-                    style: AppTextStyles.headlineSmall),
+                Text('Verifying payment...',
+                    style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
               ] else if (_success) ...[
                 const Icon(Icons.check_circle_rounded,
                     size: 72, color: AppColors.success),
                 const SizedBox(height: 24),
-                const Text('Payment successful!',
-                    style: AppTextStyles.headlineSmall),
+                Text('Payment successful!',
+                    style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                 const SizedBox(height: 8),
-                const Text('Redirecting...', style: AppTextStyles.bodyMedium),
+                Text('Redirecting...', style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true)),
               ] else ...[
                 const Icon(Icons.error_outline_rounded,
                     size: 72, color: AppColors.error),
                 const SizedBox(height: 24),
-                const Text('Payment failed',
-                    style: AppTextStyles.headlineSmall),
+                Text('Payment failed',
+                    style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                 const SizedBox(height: 8),
                 Text(_error ?? 'Unknown error',
-                    style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
+                    style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true), textAlign: TextAlign.center),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () => context.go('/dashboard'),

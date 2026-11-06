@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
@@ -106,21 +106,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: titleSize,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: AppPalette.of(context).text,
                         letterSpacing: -0.5,
                       ),
                     ).animate().fadeIn(delay: 100.ms, duration: 400.ms),
                     const SizedBox(height: 4),
                     Text(
                       'Welcome back',
-                      style: AppTextStyles.displayMedium.copyWith(
+                      style: AppTextStyles.tone(AppTextStyles.displayMedium, context).copyWith(
                         fontSize: compact ? 22 : null,
                       ),
                     ).animate().fadeIn(delay: 150.ms, duration: 400.ms),
                     const SizedBox(height: 4),
                     Text(
                       'Sign in to continue',
-                      style: AppTextStyles.bodyMedium,
+                      style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                       textAlign: TextAlign.center,
                     ).animate().fadeIn(delay: 200.ms, duration: 400.ms),
                     SizedBox(height: sectionGap),
@@ -131,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Container(
                             padding: EdgeInsets.all(cardPadding),
                             decoration: BoxDecoration(
-                              color: AppColors.white,
+                              color: AppPalette.of(context).card,
                               borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
@@ -236,18 +236,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Row(
                       children: [
-                        const Expanded(child: Divider(color: AppColors.border)),
+                        Expanded(child: Divider(color: AppPalette.of(context).border)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Don't have an account?",
                             style: TextStyle(
                               fontSize: compact ? 11 : 12,
-                              color: AppColors.textSecondary,
+                              color: AppPalette.of(context).muted,
                             ),
                           ),
                         ),
-                        const Expanded(child: Divider(color: AppColors.border)),
+                        Expanded(child: Divider(color: AppPalette.of(context).border)),
                       ],
                     ),
                     SizedBox(height: compact ? 10 : 14),
@@ -268,11 +268,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: compact ? 6 : 10),
                     TextButton(
                       onPressed: () => context.go('/'),
-                      child: const Text(
+                      child: Text(
                         'Continue as guest',
                         style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: AppPalette.of(context).muted,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

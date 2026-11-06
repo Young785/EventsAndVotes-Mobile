@@ -139,7 +139,7 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       body:
           _loading
               ? _buildSkeleton()
@@ -185,9 +185,9 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
             color: AppColors.textHint,
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Failed to load election',
-            style: AppTextStyles.bodyMedium,
+            style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           ),
           const SizedBox(height: 16),
           TextButton(onPressed: _load, child: const Text('Retry')),
@@ -341,9 +341,9 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
                     const SizedBox(height: 20),
 
                     // Dates
-                    const Text(
+                    Text(
                       'Election Period',
-                      style: AppTextStyles.headlineSmall,
+                      style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                     ).animate().fadeIn(delay: 120.ms),
                     const SizedBox(height: 10),
                     Row(
@@ -376,16 +376,16 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
                     const SizedBox(height: 20),
 
                     // Description
-                    const Text(
+                    Text(
                       'About this Election',
-                      style: AppTextStyles.headlineSmall,
+                      style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                     ).animate().fadeIn(delay: 160.ms),
                     const SizedBox(height: 8),
                     Text(
                       vote.description,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                         height: 1.6,
                       ),
                     ).animate().fadeIn(delay: 180.ms, duration: 300.ms),
@@ -393,9 +393,9 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
 
                     // Positions
                     if (_positions.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         'Positions',
-                        style: AppTextStyles.headlineSmall,
+                        style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                       ).animate().fadeIn(delay: 200.ms),
                       const SizedBox(height: 10),
                       ..._positions.asMap().entries.map(
@@ -446,9 +446,9 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         child: Column(
           children: [
@@ -464,9 +464,9 @@ class _StatCard extends StatelessWidget {
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
-                color: AppColors.textSecondary,
+                color: AppPalette.of(context).muted,
               ),
               textAlign: TextAlign.center,
             ),
@@ -494,9 +494,9 @@ class _DateCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Row(
         children: [
@@ -507,17 +507,17 @@ class _DateCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
-                  color: AppColors.textSecondary,
+                  color: AppPalette.of(context).muted,
                 ),
               ),
               Text(
                 date,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: AppPalette.of(context).text,
                 ),
               ),
             ],
@@ -569,9 +569,9 @@ class _PositionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Row(
         children: [
@@ -595,18 +595,18 @@ class _PositionCard extends StatelessWidget {
               children: [
                 Text(
                   position['title'] ?? 'Position',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppPalette.of(context).text,
                   ),
                 ),
                 if (position['nominees_count'] != null)
                   Text(
                     '${position['nominees_count']} nominees',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: AppPalette.of(context).muted,
                     ),
                   ),
               ],
@@ -660,11 +660,11 @@ class _PositionCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Select a nominee',
                       style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -701,17 +701,17 @@ class _PositionCard extends StatelessWidget {
                     if (!vote.isFree) ...[
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             'Number of votes',
                             style: TextStyle(
                               fontSize: 13,
-                              color: AppColors.textSecondary,
+                              color: AppPalette.of(context).muted,
                             ),
                           ),
                           const Spacer(),
                           Container(
                             decoration: BoxDecoration(
-                              color: AppColors.surfaceVariant,
+                              color: AppPalette.of(context).surface,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -770,12 +770,12 @@ class _PositionCard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Total',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
+                              color: AppPalette.of(context).text,
                             ),
                           ),
                           Text(
@@ -798,9 +798,9 @@ class _PositionCard extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: AppPalette.of(context).muted),
                 ),
               ),
               ElevatedButton(

@@ -233,8 +233,8 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return Container(
       margin: const EdgeInsets.only(top: 48),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Padding(
@@ -246,10 +246,10 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Add Bank Account',
-                      style: AppTextStyles.headlineSmall,
+                      style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                     ),
                   ),
                   IconButton(
@@ -258,11 +258,11 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
                   ),
                 ],
               ),
-              const Text(
+              Text(
                 'Enter your 10-digit account number and select your bank — your account name will be fetched automatically.',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.textSecondary,
+                  color: AppPalette.of(context).muted,
                   height: 1.4,
                 ),
               ),

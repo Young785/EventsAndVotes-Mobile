@@ -80,23 +80,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppPalette.of(context).background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_rounded,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
           onPressed: () => popPage(context),
         ),
-        title: const Text(
+        title: Text(
           'Change Password',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
       ),
@@ -128,9 +128,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     Expanded(
                       child: Text(
                         'For your security, please enter your current password to change it.',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textSecondary,
+                          color: AppPalette.of(context).muted,
                         ),
                       ),
                     ),
@@ -269,18 +269,18 @@ class _PasswordRequirements extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
+        color: AppPalette.of(context).surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Password requirements:',
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
+              color: AppPalette.of(context).muted,
             ),
           ),
           const SizedBox(height: 8),

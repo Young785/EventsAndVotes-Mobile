@@ -201,11 +201,11 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
         title: Text(_event?.title ?? 'Event'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppPalette.of(context).background,
+        foregroundColor: AppPalette.of(context).text,
         elevation: 0,
       ),
       body: _loading
@@ -236,8 +236,8 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Scan locations',
-                              style: AppTextStyles.headlineSmall),
+                          Text('Scan locations',
+                              style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                           TextButton.icon(
                             onPressed: _addLocation,
                             icon: const Icon(Icons.add, size: 18),
@@ -272,14 +272,14 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTextStyles.headlineSmall),
+          Text(title, style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 12),
           ...children,
         ],
@@ -293,7 +293,7 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTextStyles.bodyMedium),
+          Text(label, style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true)),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
         ],
       ),

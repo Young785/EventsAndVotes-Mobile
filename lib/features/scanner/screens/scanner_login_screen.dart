@@ -54,12 +54,12 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
     final scanner = context.watch<ScannerSessionProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back_rounded, color: AppPalette.of(context).text),
           onPressed: () => context.go('/login'),
         ),
       ),
@@ -96,13 +96,13 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
                   ),
                 ).animate().fadeIn(duration: 400.ms).scale(),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'Scanner Login',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: AppPalette.of(context).text,
                     letterSpacing: -0.4,
                   ),
                 ),
@@ -110,13 +110,13 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
                 Text(
                   'Enter the 6-digit access code from your event host.',
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyMedium,
+                  style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                 ),
                 const SizedBox(height: 28),
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: AppPalette.of(context).card,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
@@ -136,11 +136,11 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
                         maxLength: 6,
                         textAlign: TextAlign.center,
                         keyboardType: TextInputType.text,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 10,
-                          color: AppColors.textPrimary,
+                          color: AppPalette.of(context).text,
                           height: 1.2,
                         ),
                         hintStyle: TextStyle(
@@ -178,7 +178,7 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
                             Expanded(
                               child: Text(
                                 'Your host shares this 6-digit code when you are assigned to a gate.',
-                                style: AppTextStyles.bodySmall.copyWith(
+                                style: AppTextStyles.tone(AppTextStyles.bodySmall, context, muted: true).copyWith(
                                   color: AppColors.primaryDark,
                                 ),
                               ),
@@ -200,18 +200,18 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
                 Text(
                   'Code is checked with the event server in real time.',
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.bodySmall.copyWith(
+                  style: AppTextStyles.tone(AppTextStyles.bodySmall, context, muted: true).copyWith(
                     color: AppColors.textHint,
                   ),
                 ),
                 const SizedBox(height: 24),
                 TextButton(
                   onPressed: () => context.go('/login'),
-                  child: const Text(
+                  child: Text(
                     'Back to user login',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textSecondary,
+                      color: AppPalette.of(context).muted,
                     ),
                   ),
                 ),

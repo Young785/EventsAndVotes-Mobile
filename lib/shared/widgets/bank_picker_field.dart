@@ -110,8 +110,8 @@ class _BankSearchSheetState extends State<_BankSearchSheet> {
 
     return Container(
       height: height,
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -121,13 +121,13 @@ class _BankSearchSheetState extends State<_BankSearchSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: AppPalette.of(context).border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16),
-            child: Text('Select bank', style: AppTextStyles.headlineSmall),
+            child: Text('Select bank', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -116,7 +116,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: _load,
@@ -138,7 +138,7 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
                     ),
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
                     itemCount: _tickets.length,
                     itemBuilder: (_, i) => Padding(
                       padding: const EdgeInsets.only(bottom: 28),
@@ -161,8 +161,8 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
           const Icon(Icons.confirmation_number_outlined,
               size: 48, color: AppColors.primary),
           const SizedBox(height: 16),
-          const Text('Sign in to view your tickets',
-              style: AppTextStyles.headlineSmall),
+          Text('Sign in to view your tickets',
+              style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () => context.go('/login'),
@@ -186,11 +186,11 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
                 const Icon(Icons.wifi_off_rounded,
                     size: 48, color: AppColors.textHint),
                 const SizedBox(height: 12),
-                const Text('Could not load tickets',
-                    style: AppTextStyles.headlineSmall),
+                Text('Could not load tickets',
+                    style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                 const SizedBox(height: 6),
                 Text(message,
-                    style: AppTextStyles.bodyMedium,
+                    style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                     textAlign: TextAlign.center),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
@@ -211,16 +211,16 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.25),
-        const Center(
+        Center(
           child: Column(
             children: [
               Icon(Icons.confirmation_number_outlined,
                   size: 48, color: AppColors.textHint),
               SizedBox(height: 12),
-              Text('No tickets yet', style: AppTextStyles.headlineSmall),
+              Text('No tickets yet', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
               SizedBox(height: 6),
               Text('Purchase event tickets to see them here',
-                  style: AppTextStyles.bodyMedium),
+                  style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true)),
             ],
           ),
         ),
@@ -473,8 +473,8 @@ class _WalletPassCard extends StatelessWidget {
             child: Container(
               width: _notchD,
               height: _notchD,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
+              decoration: BoxDecoration(
+                color: AppPalette.of(context).background,
                 shape: BoxShape.circle,
               ),
             ),
@@ -486,8 +486,8 @@ class _WalletPassCard extends StatelessWidget {
             child: Container(
               width: _notchD,
               height: _notchD,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
+              decoration: BoxDecoration(
+                color: AppPalette.of(context).background,
                 shape: BoxShape.circle,
               ),
             ),
@@ -947,9 +947,9 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
 
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.all(Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: AppPalette.of(context).card,
+        borderRadius: const BorderRadius.all(Radius.circular(24)),
       ),
       child: Padding(
         padding:
@@ -968,12 +968,12 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
             const SizedBox(height: 14),
             // Title
             Text(widget.ticket.eventTitle ?? 'Ticket',
-                style: AppTextStyles.headlineSmall,
+                style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                 textAlign: TextAlign.center),
             if ((widget.ticket.tierName ?? '').isNotEmpty) ...[
               const SizedBox(height: 3),
               Text(widget.ticket.tierName!,
-                  style: AppTextStyles.bodyMedium),
+                  style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true)),
             ],
             const SizedBox(height: 14),
             // QR image

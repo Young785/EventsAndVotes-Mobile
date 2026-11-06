@@ -290,11 +290,11 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('No events found', style: AppTextStyles.headlineSmall),
+          Text('No events found', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Try adjusting your filters',
-            style: AppTextStyles.bodyMedium,
+            style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           ),
         ],
       ),

@@ -46,10 +46,10 @@ class AppTextField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
         const SizedBox(height: 8),
@@ -65,9 +65,9 @@ class AppTextField extends StatelessWidget {
           onTap: onTap,
           onChanged: onChanged,
           style: style ??
-              const TextStyle(
+              TextStyle(
                 fontSize: 15,
-                color: AppColors.textPrimary,
+                color: AppPalette.of(context).text,
                 fontWeight: FontWeight.w500,
               ),
           decoration: InputDecoration(

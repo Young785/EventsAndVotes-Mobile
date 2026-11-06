@@ -52,20 +52,20 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
     final email = user?.email ?? userInfo['email']?.toString() ?? '';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppPalette.of(context).background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded, size: 20),
           onPressed: () => popPage(context),
         ),
-        title: const Text(
+        title: Text(
           'Account Overview',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
       ),
@@ -252,21 +252,21 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text(
               'Contact Information',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
+                color: AppPalette.of(context).text,
               ),
             ),
           ),
@@ -285,7 +285,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
+                          color: AppPalette.of(context).surface,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(item.icon, size: 18, color: AppColors.primary),
@@ -297,9 +297,9 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                           children: [
                             Text(
                               item.label,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textSecondary,
+                                color: AppPalette.of(context).muted,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -317,7 +317,7 @@ class _ProfileDetailsScreenState extends State<ProfileDetailsScreen> {
                   ),
                 ),
                 if (e.key < items.length - 1)
-                  const Divider(height: 1, color: AppColors.border),
+                  Divider(height: 1, color: AppPalette.of(context).border),
               ],
             );
           }),

@@ -54,15 +54,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: AppPalette.of(context).background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_rounded,
             size: 18,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
           onPressed: () => popPage(context),
         ),
@@ -97,14 +97,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ).animate().fadeIn(duration: 300.ms),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Forgot Password?',
-            style: AppTextStyles.displayMedium,
+            style: AppTextStyles.tone(AppTextStyles.displayMedium, context),
           ).animate().fadeIn(delay: 80.ms),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Enter your email and we\'ll send you a reset link.',
-            style: AppTextStyles.bodyMedium,
+            style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           ).animate().fadeIn(delay: 120.ms),
           const SizedBox(height: 32),
           AppTextField(
@@ -134,9 +134,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           Center(
             child: TextButton(
               onPressed: () => context.go('/login'),
-              child: const Text(
+              child: Text(
                 'Back to Sign In',
-                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                style: TextStyle(fontSize: 13, color: AppPalette.of(context).muted),
               ),
             ),
           ).animate().fadeIn(delay: 240.ms),
@@ -163,15 +163,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
         const SizedBox(height: 24),
-        const Text(
+        Text(
           'Check Your Email',
-          style: AppTextStyles.headlineLarge,
+          style: AppTextStyles.tone(AppTextStyles.headlineLarge, context),
           textAlign: TextAlign.center,
         ).animate().fadeIn(delay: 200.ms),
         const SizedBox(height: 8),
         Text(
           'We sent a password reset link to\n${_emailCtrl.text}',
-          style: AppTextStyles.bodyMedium,
+          style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           textAlign: TextAlign.center,
         ).animate().fadeIn(delay: 300.ms),
         const SizedBox(height: 32),

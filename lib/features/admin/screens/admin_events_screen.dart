@@ -41,11 +41,11 @@ class _AdminEventsScreenState extends State<AdminEventsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
         title: const Text('My Events'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppPalette.of(context).background,
+        foregroundColor: AppPalette.of(context).text,
         elevation: 0,
         actions: [
           IconButton(
@@ -76,9 +76,9 @@ class _AdminEventsScreenState extends State<AdminEventsScreen> {
                       return ListTile(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
-                          side: const BorderSide(color: AppColors.border),
+                          side: BorderSide(color: AppPalette.of(context).border),
                         ),
-                        tileColor: AppColors.white,
+                        tileColor: AppPalette.of(context).card,
                         title: Text(e.title,
                             style: const TextStyle(fontWeight: FontWeight.w700)),
                         subtitle: Text('${e.venue} · ${e.status}'),

@@ -181,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final auth = context.watch<AuthProvider>();
     if (!auth.isAuthenticated) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppPalette.of(context).background,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -200,14 +200,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Sign in to access your dashboard',
-                style: AppTextStyles.headlineSmall,
+                style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Track referrals, earnings and more',
-                style: AppTextStyles.bodyMedium,
+                style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
@@ -221,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: _load,
@@ -244,7 +244,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           _buildReferralCard(),
                           _buildTabBar(),
                           _buildTabContent(),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 120),
                         ],
                       ),
             ),
@@ -386,7 +386,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppPalette.of(context).card,
               borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
@@ -428,9 +428,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const SizedBox(height: 6),
                       Text(
                         item['label'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: AppPalette.of(context).muted,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -451,14 +451,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Your Referral Code', style: AppTextStyles.headlineSmall),
+          Text('Your Referral Code', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -491,29 +491,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('Your Referral Link', style: AppTextStyles.headlineSmall),
+          Text('Your Referral Link', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: AppPalette.of(context).surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.link_rounded,
                   size: 16,
-                  color: AppColors.textSecondary,
+                  color: AppPalette.of(context).muted,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     _referralLink,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: AppPalette.of(context).muted,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -591,11 +591,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Earn commissions when friends register and make purchases!',
             style: TextStyle(
               fontSize: 11,
-              color: AppColors.textSecondary,
+              color: AppPalette.of(context).muted,
               height: 1.4,
             ),
           ),
@@ -611,7 +611,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: AppColors.surfaceVariant,
+          color: AppPalette.of(context).surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -693,17 +693,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Earnings Overview', style: AppTextStyles.headlineSmall),
+          Text('Earnings Overview', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 10),
           _buildEarningsChart(stats),
           const SizedBox(height: 16),
-          const Text('Commission Rates', style: AppTextStyles.headlineSmall),
+          Text('Commission Rates', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppPalette.of(context).card,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Column(
               children:
@@ -720,9 +720,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               Text(
                                 e.value['label']!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
-                                  color: AppColors.textSecondary,
+                                  color: AppPalette.of(context).muted,
                                 ),
                               ),
                               Container(
@@ -747,14 +747,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ),
                         if (e.key < rateItems.length - 1)
-                          const Divider(height: 1, color: AppColors.border),
+                          Divider(height: 1, color: AppPalette.of(context).border),
                       ],
                     );
                   }).toList(),
             ),
           ).animate().fadeIn(delay: 100.ms, duration: 300.ms),
           const SizedBox(height: 16),
-          const Text('Recent Activity', style: AppTextStyles.headlineSmall),
+          Text('Recent Activity', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 10),
           _buildRecentActivity(stats['recent_referrals'] as List? ?? []),
         ],
@@ -767,16 +767,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
-        child: const Center(
+        child: Center(
           child: Column(
             children: [
               Icon(Icons.inbox_outlined, size: 32, color: AppColors.textHint),
               SizedBox(height: 8),
-              Text('No recent activity', style: AppTextStyles.bodyMedium),
+              Text('No recent activity', style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true)),
             ],
           ),
         ),
@@ -784,9 +784,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         children:
@@ -819,10 +819,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Text(
                                 item['description']?.toString() ??
                                     'Referral activity',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: AppColors.textPrimary,
+                                  color: AppPalette.of(context).text,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -833,9 +833,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       10,
                                     ) ??
                                     '',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
-                                  color: AppColors.textSecondary,
+                                  color: AppPalette.of(context).muted,
                                 ),
                               ),
                             ],
@@ -845,7 +845,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   if (e.key < items.length - 1)
-                    const Divider(height: 1, color: AppColors.border),
+                    Divider(height: 1, color: AppPalette.of(context).border),
                 ],
               );
             }).toList(),
@@ -857,9 +857,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -867,9 +867,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Monthly Earnings',
-                style: AppTextStyles.headlineSmall,
+                style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -909,7 +909,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   horizontalInterval: 1,
                   getDrawingHorizontalLine:
                       (value) => FlLine(
-                        color: AppColors.border.withValues(alpha: 0.3),
+                        color: AppPalette.of(context).border.withValues(alpha: 0.3),
                         strokeWidth: 1,
                       ),
                 ),
@@ -937,9 +937,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             value.toInt() < months.length) {
                           return Text(
                             months[value.toInt()],
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: AppColors.textSecondary,
+                              color: AppPalette.of(context).muted,
                             ),
                           );
                         }
@@ -955,9 +955,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         if (value.toInt() % 5000 == 0 && value.toInt() > 0) {
                           return Text(
                             '₦${(value.toInt() / 1000).toInt()}k',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: AppColors.textSecondary,
+                              color: AppPalette.of(context).muted,
                             ),
                           );
                         }
@@ -1022,11 +1022,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ? Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppPalette.of(context).card,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: AppPalette.of(context).border),
                 ),
-                child: const Center(
+                child: Center(
                   child: Column(
                     children: [
                       Icon(
@@ -1037,12 +1037,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(height: 12),
                       Text(
                         'No transactions yet',
-                        style: AppTextStyles.headlineSmall,
+                        style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                       ),
                       SizedBox(height: 6),
                       Text(
                         'Your transaction history will appear here',
-                        style: AppTextStyles.bodyMedium,
+                        style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                       ),
                     ],
                   ),
@@ -1057,9 +1057,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppPalette.of(context).card,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: AppPalette.of(context).border),
                         ),
                         child: Row(
                           children: [
@@ -1096,10 +1096,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Text(
                                     t['description']?.toString() ??
                                         'Transaction',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                      color: AppPalette.of(context).text,
                                     ),
                                   ),
                                   Text(
@@ -1108,9 +1108,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           10,
                                         ) ??
                                         '',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: AppPalette.of(context).muted,
                                     ),
                                   ),
                                 ],
@@ -1157,11 +1157,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ? Container(
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: AppPalette.of(context).card,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: AppPalette.of(context).border),
                 ),
-                child: const Center(
+                child: Center(
                   child: Column(
                     children: [
                       Icon(
@@ -1172,12 +1172,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       SizedBox(height: 12),
                       Text(
                         'No referrals yet',
-                        style: AppTextStyles.headlineSmall,
+                        style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                       ),
                       SizedBox(height: 6),
                       Text(
                         'Share your link to start earning!',
-                        style: AppTextStyles.bodyMedium,
+                        style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                       ),
                     ],
                   ),
@@ -1191,9 +1191,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.white,
+                          color: AppPalette.of(context).card,
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: AppPalette.of(context).border),
                         ),
                         child: Row(
                           children: [
@@ -1218,17 +1218,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Text(
                                     r['referred_user_name']?.toString() ??
                                         'User',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                      color: AppPalette.of(context).text,
                                     ),
                                   ),
                                   Text(
                                     r['commission_type']?.toString() ?? '',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.textSecondary,
+                                      color: AppPalette.of(context).muted,
                                     ),
                                   ),
                                 ],
@@ -1329,16 +1329,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: AppPalette.of(context).card,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Earnings Breakdown',
-                  style: AppTextStyles.headlineSmall,
+                  style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                 ),
                 const SizedBox(height: 12),
                 _EarningRow(
@@ -1347,21 +1347,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       '₦${(_referral?['statistics']?['total_earnings'] ?? 0).toString()}',
                   color: AppColors.success,
                 ),
-                const Divider(height: 20, color: AppColors.border),
+                Divider(height: 20, color: AppPalette.of(context).border),
                 _EarningRow(
                   label: 'Registration Referrals',
                   value:
                       '${_referral?['statistics']?['registration_referrals'] ?? 0}',
                   color: AppColors.primary,
                 ),
-                const Divider(height: 20, color: AppColors.border),
+                Divider(height: 20, color: AppPalette.of(context).border),
                 _EarningRow(
                   label: 'Subscription Referrals',
                   value:
                       '${_referral?['statistics']?['subscription_referrals'] ?? 0}',
                   color: AppColors.accent,
                 ),
-                const Divider(height: 20, color: AppColors.border),
+                Divider(height: 20, color: AppPalette.of(context).border),
                 _EarningRow(
                   label: 'Vote Referrals',
                   value: '${_referral?['statistics']?['vote_referrals'] ?? 0}',
@@ -1381,9 +1381,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1404,7 +1404,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1413,14 +1413,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: AppPalette.of(context).text,
                       ),
                     ),
                     Text(
                       'Minimum withdrawal: ₦1,000',
                       style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                       ),
                     ),
                   ],
@@ -1429,7 +1429,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           const SizedBox(height: 12),
-          const Divider(color: AppColors.border),
+          Divider(color: AppPalette.of(context).border),
           const SizedBox(height: 12),
           _infoRow(label: 'Processing Time', value: '1-3 business days'),
           _infoRow(label: 'Withdrawal Method', value: 'Bank Transfer'),
@@ -1447,17 +1447,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: AppPalette.of(context).muted,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: AppPalette.of(context).text,
             ),
           ),
         ],
@@ -1495,9 +1495,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Text(
                     'Available: ₦${balance.toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: AppColors.textSecondary,
+                      color: AppPalette.of(context).muted,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -1534,11 +1534,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Minimum withdrawal: ₦1,000',
                     style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.textSecondary,
+                      color: AppPalette.of(context).muted,
                     ),
                   ),
                 ],
@@ -1547,9 +1547,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'Cancel',
-                  style: TextStyle(color: AppColors.textSecondary),
+                  style: TextStyle(color: AppPalette.of(context).muted),
                 ),
               ),
               ElevatedButton(
@@ -1641,8 +1641,8 @@ class _StatusPill extends StatelessWidget {
         fg = AppColors.warning;
         break;
       default:
-        bg = AppColors.border;
-        fg = AppColors.textSecondary;
+        bg = AppPalette.of(context).border;
+        fg = AppPalette.of(context).muted;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -1675,7 +1675,7 @@ class _EarningRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 13, color: AppPalette.of(context).muted),
         ),
         Text(
           value,
@@ -1713,8 +1713,8 @@ class _TransactionStatus extends StatelessWidget {
         fg = AppColors.error;
         break;
       default:
-        bg = AppColors.border;
-        fg = AppColors.textSecondary;
+        bg = AppPalette.of(context).border;
+        fg = AppPalette.of(context).muted;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

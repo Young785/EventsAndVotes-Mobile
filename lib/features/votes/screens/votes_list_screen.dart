@@ -257,11 +257,11 @@ class _VotesListScreenState extends State<VotesListScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text('No elections found', style: AppTextStyles.headlineSmall),
+          Text('No elections found', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Try adjusting your filters',
-            style: AppTextStyles.bodyMedium,
+            style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           ),
         ],
       ),

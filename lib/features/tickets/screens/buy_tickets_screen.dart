@@ -166,7 +166,7 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
           : _event == null
@@ -182,7 +182,7 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
                             Expanded(
                               child: Text(
                                 'Buy Tickets',
-                                style: AppTextStyles.headlineSmall,
+                                style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                               ),
                             ),
                           ],
@@ -194,14 +194,14 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
                       sliver: SliverList(
                         delegate: SliverChildListDelegate([
                           Text(_event!.title,
-                              style: AppTextStyles.displayMedium),
+                              style: AppTextStyles.tone(AppTextStyles.displayMedium, context)),
                           const SizedBox(height: 16),
                           ..._event!.ticketTiers
                               .where((t) => t.isActive)
                               .map(_buildTierRow),
                           const SizedBox(height: 20),
-                          const Text('Your details',
-                              style: AppTextStyles.headlineSmall),
+                          Text('Your details',
+                              style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                           const SizedBox(height: 12),
                           AppTextField(
                             controller: _nameCtrl,
@@ -273,9 +273,9 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Row(
         children: [

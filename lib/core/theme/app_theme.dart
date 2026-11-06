@@ -169,6 +169,12 @@ class AppTextStyles {
     color: AppColors.textHint,
     letterSpacing: 0.4,
   );
+
+  static TextStyle tone(TextStyle style, BuildContext context, {bool muted = false}) {
+    return style.copyWith(
+      color: muted ? AppPalette.of(context).muted : AppPalette.of(context).text,
+    );
+  }
 }
 
 class AppTheme {
@@ -184,18 +190,18 @@ class AppTheme {
         surface: AppColors.surface,
       ),
       scaffoldBackgroundColor: AppColors.background,
-      textTheme: const TextTheme(
-        displayLarge: AppTextStyles.displayLarge,
-        displayMedium: AppTextStyles.displayMedium,
-        headlineLarge: AppTextStyles.headlineLarge,
-        headlineMedium: AppTextStyles.headlineMedium,
-        headlineSmall: AppTextStyles.headlineSmall,
-        bodyLarge: AppTextStyles.bodyLarge,
-        bodyMedium: AppTextStyles.bodyMedium,
-        bodySmall: AppTextStyles.bodySmall,
-        labelLarge: AppTextStyles.labelLarge,
-        labelMedium: AppTextStyles.labelMedium,
-        labelSmall: AppTextStyles.labelSmall,
+      textTheme: TextTheme(
+        displayLarge: AppTextStyles.displayLarge.copyWith(color: AppColors.textPrimary),
+        displayMedium: AppTextStyles.displayMedium.copyWith(color: AppColors.textPrimary),
+        headlineLarge: AppTextStyles.headlineLarge.copyWith(color: AppColors.textPrimary),
+        headlineMedium: AppTextStyles.headlineMedium.copyWith(color: AppColors.textPrimary),
+        headlineSmall: AppTextStyles.headlineSmall.copyWith(color: AppColors.textPrimary),
+        bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
+        bodyMedium: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+        bodySmall: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        labelLarge: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+        labelMedium: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary),
+        labelSmall: AppTextStyles.labelSmall.copyWith(color: AppColors.textHint),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.white,
@@ -356,10 +362,32 @@ class AppTheme {
         ),
       ),
       cardTheme: lightTheme.cardTheme.copyWith(color: AppNight.card),
+      textTheme: TextTheme(
+        displayLarge: AppTextStyles.displayLarge.copyWith(color: AppNight.text),
+        displayMedium: AppTextStyles.displayMedium.copyWith(color: AppNight.text),
+        headlineLarge: AppTextStyles.headlineLarge.copyWith(color: AppNight.text),
+        headlineMedium: AppTextStyles.headlineMedium.copyWith(color: AppNight.text),
+        headlineSmall: AppTextStyles.headlineSmall.copyWith(color: AppNight.text),
+        bodyLarge: AppTextStyles.bodyLarge.copyWith(color: AppNight.text),
+        bodyMedium: AppTextStyles.bodyMedium.copyWith(color: AppNight.muted),
+        bodySmall: AppTextStyles.bodySmall.copyWith(color: AppNight.muted),
+        labelLarge: AppTextStyles.labelLarge.copyWith(color: AppNight.text),
+        labelMedium: AppTextStyles.labelMedium.copyWith(color: AppNight.muted),
+        labelSmall: AppTextStyles.labelSmall.copyWith(color: AppNight.muted),
+      ),
+      iconTheme: const IconThemeData(color: AppNight.text),
       inputDecorationTheme: lightTheme.inputDecorationTheme.copyWith(
         fillColor: AppNight.surfaceHigh,
         hintStyle: const TextStyle(color: AppNight.muted, fontSize: 14),
         labelStyle: const TextStyle(color: AppNight.muted, fontSize: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppNight.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppNight.border),
+        ),
       ),
       dividerColor: AppNight.border,
       dividerTheme: const DividerThemeData(color: AppNight.border, thickness: 1, space: 0),

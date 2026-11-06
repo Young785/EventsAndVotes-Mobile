@@ -164,8 +164,8 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return Container(
       margin: const EdgeInsets.only(top: 80),
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Padding(
@@ -186,7 +186,7 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
                         width: 36,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: AppColors.border,
+                          color: AppPalette.of(context).border,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -195,10 +195,10 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
                     // Header
                     Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Request Withdrawal',
-                            style: AppTextStyles.headlineSmall,
+                            style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
                           ),
                         ),
                         IconButton(

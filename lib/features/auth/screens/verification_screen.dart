@@ -96,7 +96,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     final email = auth.user?.email ?? 'your email';
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: _initialLoad
@@ -126,7 +126,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         SizedBox(height: compact ? 16 : 20),
                         Text(
                           'Verify your email',
-                          style: AppTextStyles.displayMedium.copyWith(
+                          style: AppTextStyles.tone(AppTextStyles.displayMedium, context).copyWith(
                             fontSize: compact ? 22 : null,
                           ),
                           textAlign: TextAlign.center,
@@ -135,7 +135,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                         Text(
                           'We sent a 6-digit code to $email. '
                           'Enter it below to access your dashboard.',
-                          style: AppTextStyles.bodyMedium,
+                          style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: compact ? 20 : 28),
@@ -146,7 +146,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                               Container(
                                 padding: EdgeInsets.all(compact ? 16 : 20),
                                 decoration: BoxDecoration(
-                                  color: AppColors.white,
+                                  color: AppPalette.of(context).card,
                                   borderRadius: BorderRadius.circular(20),
                                   boxShadow: [
                                     BoxShadow(
@@ -191,8 +191,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                     const SizedBox(height: 8),
                                     Text(
                                       'Check your inbox and spam folder.',
-                                      style: AppTextStyles.bodySmall.copyWith(
-                                        color: AppColors.textSecondary,
+                                      style: AppTextStyles.tone(AppTextStyles.bodySmall, context, muted: true).copyWith(
+                                        color: AppPalette.of(context).muted,
                                       ),
                                     ),
                                     SizedBox(height: compact ? 16 : 20),

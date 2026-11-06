@@ -40,7 +40,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final user = auth.user;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       body: RefreshIndicator(
         onRefresh: _load,
         child: CustomScrollView(
@@ -48,16 +48,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  MediaQuery.paddingOf(context).top + 16,
+                  16,
+                  24,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Vendor Dashboard',
-                        style: AppTextStyles.displayMedium),
+                        style: AppTextStyles.tone(AppTextStyles.displayMedium, context)),
                     const SizedBox(height: 4),
                     Text(
                       '${user?.role.displayName ?? 'Admin'} · ${user?.fullName ?? ''}',
-                      style: AppTextStyles.bodyMedium,
+                      style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                     ),
                     const SizedBox(height: 20),
                     if (_loading)
@@ -85,8 +90,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       ),
                     ],
                     const SizedBox(height: 24),
-                    const Text('Quick actions',
-                        style: AppTextStyles.headlineSmall),
+                    Text('Quick actions',
+                        style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                     const SizedBox(height: 12),
                     if (user?.canManageEvents == true) ...[
                       _actionTile(
@@ -123,9 +128,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Row(
         children: [
@@ -143,7 +148,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: AppTextStyles.bodyMedium),
+                Text(label, style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true)),
                 Text(value,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.w800)),
@@ -164,7 +169,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: Material(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(14),
         child: InkWell(
           onTap: onTap,
@@ -173,7 +178,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Row(
               children: [
@@ -186,8 +191,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       Text(title,
                           style: const TextStyle(fontWeight: FontWeight.w700)),
                       Text(subtitle,
-                          style: const TextStyle(
-                              fontSize: 12, color: AppColors.textSecondary)),
+                          style: TextStyle(
+                              fontSize: 12, color: AppPalette.of(context).muted)),
                     ],
                   ),
                 ),

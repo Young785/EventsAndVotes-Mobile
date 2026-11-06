@@ -113,8 +113,8 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
     final height = MediaQuery.sizeOf(context).height * 0.72;
     return Container(
       height: height,
-      decoration: const BoxDecoration(
-        color: AppColors.white,
+      decoration: BoxDecoration(
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -124,7 +124,7 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: AppColors.border,
+              color: AppPalette.of(context).border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -132,8 +132,8 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
             padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
             child: Row(
               children: [
-                const Expanded(
-                  child: Text('Notifications', style: AppTextStyles.headlineSmall),
+                Expanded(
+                  child: Text('Notifications', style: AppTextStyles.tone(AppTextStyles.headlineSmall, context)),
                 ),
                 TextButton(
                   onPressed: _items.isEmpty ? null : _markAllRead,
@@ -151,10 +151,10 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
                 : _items.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No notifications yet',
-                          style: AppTextStyles.bodyMedium,
+                          style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
                         ),
                       )
                     : ListView.separated(
@@ -248,9 +248,9 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
                                             const SizedBox(height: 4),
                                             Text(
                                               message,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 12,
-                                                color: AppColors.textSecondary,
+                                                color: AppPalette.of(context).muted,
                                               ),
                                             ),
                                           ],

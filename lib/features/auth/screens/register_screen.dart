@@ -167,15 +167,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppPalette.of(context).background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_rounded,
             size: 20,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
           onPressed: () {
             if (_step > 0) {
@@ -185,12 +185,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             }
           },
         ),
-        title: const Text(
+        title: Text(
           'Create Account',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
       ),
@@ -232,7 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               Text(
                 _step == 0 ? 'Account details' : 'Profile & location',
-                style: AppTextStyles.bodySmall,
+                style: AppTextStyles.tone(AppTextStyles.bodySmall, context, muted: true),
               ),
             ],
           ),
@@ -258,11 +258,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         key: const ValueKey('step1'),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Your account', style: AppTextStyles.headlineLarge),
+          Text('Your account', style: AppTextStyles.tone(AppTextStyles.headlineLarge, context)),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Enter your name, email, phone and password',
-            style: AppTextStyles.bodyMedium,
+            style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           ),
           const SizedBox(height: 24),
           _card(
@@ -386,11 +386,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         key: const ValueKey('step2'),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('About you', style: AppTextStyles.headlineLarge),
+          Text('About you', style: AppTextStyles.tone(AppTextStyles.headlineLarge, context)),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Date of birth, location and optional referral',
-            style: AppTextStyles.bodyMedium,
+            style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true),
           ),
           const SizedBox(height: 24),
           _card(
@@ -455,7 +455,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -479,12 +479,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Date of Birth *',
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
         const SizedBox(height: 8),
@@ -503,9 +503,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
             decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
+              color: AppPalette.of(context).surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Row(
               children: [
@@ -544,21 +544,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Country *',
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: AppPalette.of(context).surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppPalette.of(context).border),
           ),
           child: const Row(
             children: [
@@ -598,19 +598,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: AppPalette.of(context).text,
           ),
         ),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: AppPalette.of(context).surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: AppPalette.of(context).border),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -623,9 +623,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Text(hint ?? '', style: const TextStyle(color: AppColors.textHint)),
                 ],
               ),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
-                color: AppColors.textPrimary,
+                color: AppPalette.of(context).text,
                 fontWeight: FontWeight.w500,
               ),
               items: items
@@ -663,10 +663,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 : null,
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
               'I agree to the Terms and Conditions of this Platform.',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 13, color: AppPalette.of(context).muted),
             ),
           ),
         ],

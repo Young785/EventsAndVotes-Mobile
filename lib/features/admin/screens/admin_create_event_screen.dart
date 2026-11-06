@@ -68,11 +68,11 @@ class _AdminCreateEventScreenState extends State<AdminCreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppPalette.of(context).background,
       appBar: AppBar(
         title: const Text('Create Event'),
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppPalette.of(context).background,
+        foregroundColor: AppPalette.of(context).text,
         elevation: 0,
       ),
       body: Form(
