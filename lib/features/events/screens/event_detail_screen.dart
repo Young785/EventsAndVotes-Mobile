@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/events_service.dart';
@@ -71,6 +73,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       return;
     }
     context.push('/events/${widget.eventId}/tickets?tier=${tier.id}');
+  }
+
+  Future<void> _openVenueMap(String venue) async {
+    final query = venue.trim();
+    if (query.isEmpty) return;
+    final encoded = Uri.encodeComponent(query);
+    final uri = defaultTargetPlatform == TargetPlatform.iOS
+        ? Uri.parse('https://maps.apple.com/?q=$encoded')
+        : Uri.parse('https://www.google.com/maps/search/?api=1&query=$encoded');
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened && mounted) {
+      showTopAlert(
+        context,
+        const SnackBar(content: Text('Could not open maps for this venue')),
+      );
+    }
   }
 
   @override
@@ -162,44 +180,65 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const SizedBox(height: 14),
                     Row(
                       children: [
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: AppPalette.of(context).raised,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.location_on_outlined,
-                            color: AppColors.primaryLight,
-                            size: 18,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                event.venue.isEmpty ? 'Venue to be announced' : event.venue,
-                                style: TextStyle(
-                                  color: AppPalette.of(context).text,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              if (event.totalCapacity != null)
-                                Text(
-                                  'Capacity ${event.totalCapacity} verified attendees',
-                                  style: TextStyle(
-                                    color: AppPalette.of(context).muted,
-                                    fontSize: 12,
+                          child: InkWell(
+                            onTap: event.venue.isEmpty
+                                ? null
+                                : () => _openVenueMap(event.venue),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: AppPalette.of(context).raised,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.location_on_outlined,
+                                      color: AppColors.primaryLight,
+                                      size: 18,
+                                    ),
                                   ),
-                                ),
-                            ],
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          event.venue.isEmpty
+                                              ? 'Venue to be announced'
+                                              : event.venue,
+                                          style: TextStyle(
+                                            color: AppPalette.of(context).text,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        if (event.totalCapacity != null)
+                                          Text(
+                                            'Capacity ${event.totalCapacity} verified attendees',
+                                            style: TextStyle(
+                                              color: AppPalette.of(context).muted,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (event.venue.isNotEmpty)
+                                    Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: AppPalette.of(context).muted,
+                                    ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                        Icon(Icons.chevron_right_rounded, color: AppPalette.of(context).muted),
                       ],
                     ),
                     const SizedBox(height: 16),

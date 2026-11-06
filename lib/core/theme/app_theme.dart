@@ -209,7 +209,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0.5,
         shadowColor: AppColors.border,
-        centerTitle: false,
+        centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,

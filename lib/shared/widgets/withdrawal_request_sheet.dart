@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/json_parse_utils.dart';
 import 'add_bank_account_sheet.dart';
 import 'app_alert.dart';
+import 'bank_picker_field.dart';
 
 class WithdrawalRequestSheet extends StatefulWidget {
   const WithdrawalRequestSheet({super.key});
@@ -314,11 +315,18 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
               for (var i = 0; i < _banks.length; i++)
                 DropdownMenuItem(
                   value: _bankAccountPickerKey(_banks[i], i),
-                  child: Text(
-                    '${_banks[i]['bank_name'] ?? _banks[i]['bank']?['name'] ?? 'Bank'} — '
-                    '${_banks[i]['account_number'] ?? _banks[i]['account_no'] ?? ''} '
-                    '(${_banks[i]['account_name'] ?? ''})',
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      BankLogo(bank: _bankMark(_banks[i]), size: 28),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          '${_banks[i]['bank_name'] ?? _banks[i]['bank']?['name'] ?? 'Bank'} — '
+                          '${_banks[i]['account_number'] ?? _banks[i]['account_no'] ?? ''}',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
             ],
@@ -328,4 +336,15 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
     );
   }
 
+  Map<String, dynamic> _bankMark(Map<String, dynamic> account) {
+    final nested = account['bank'];
+    if (nested is Map) {
+      return Map<String, dynamic>.from(nested);
+    }
+    return {
+      'name': account['bank_name'] ?? 'Bank',
+      'code': account['bank_code'],
+      'logo': account['logo'] ?? account['bank_logo'] ?? account['logo_url'],
+    };
+  }
 }

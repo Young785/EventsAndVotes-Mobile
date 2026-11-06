@@ -10,6 +10,7 @@ import '../../../features/events/models/event_model.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/detail_back_button.dart';
+import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/app_alert.dart';
 
 class BuyTicketsScreen extends StatefulWidget {
@@ -168,26 +169,16 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
     return Scaffold(
       backgroundColor: AppPalette.of(context).background,
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
+          ? const Padding(
+              padding: EdgeInsets.fromLTRB(16, 80, 16, 16),
+              child: ShimmerList(count: 6, itemHeight: 72),
+            )
           : _event == null
               ? const Center(child: Text('Event not found'))
               : CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                        child: Row(
-                          children: [
-                            const DetailBackButton(),
-                            Expanded(
-                              child: Text(
-                                'Buy Tickets',
-                                style: AppTextStyles.tone(AppTextStyles.headlineSmall, context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: const CenteredPageHeader(title: 'Buy Tickets'),
                     ),
                     SliverPadding(
                       padding: const EdgeInsets.all(16),
@@ -226,15 +217,20 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppColors.primarySurface,
+                              color: AppPalette.of(context).card,
                               borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: AppPalette.of(context).border),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Total',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700)),
+                                Text(
+                                  'Total',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppPalette.of(context).text,
+                                  ),
+                                ),
                                 Text(
                                   _total == 0
                                       ? 'FREE'

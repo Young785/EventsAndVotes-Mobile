@@ -155,7 +155,24 @@ class BankAccountService {
     normalized['bank_id'] ??=
         bank['bank_id']?.toString() ?? bank['id']?.toString();
     normalized['id'] ??= normalized['bank_id'];
+    normalized['logo'] ??=
+        bank['logo'] ?? bank['logo_url'] ?? bank['image'] ?? bank['bank_logo'];
     return normalized;
+  }
+
+  /// Remote logo when the API sends one, otherwise the public Nigerian bank mark.
+  static String? bankLogoUrl(Map<String, dynamic> bank) {
+    for (final key in ['logo', 'logo_url', 'image', 'bank_logo']) {
+      final value = bank[key]?.toString().trim() ?? '';
+      if (value.startsWith('http')) return value;
+    }
+    final slug = bankDisplayName(bank)
+        .toLowerCase()
+        .replaceAll('&', ' and ')
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+$'), '');
+    if (slug.isEmpty) return null;
+    return 'https://nigerianbanks.xyz/logo/$slug.png';
   }
 
   static String bankDisplayName(Map<String, dynamic> bank) =>

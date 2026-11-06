@@ -16,14 +16,16 @@ class ShimmerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final colors = AppPalette.of(context);
     return Shimmer.fromColors(
-      baseColor: AppColors.border,
-      highlightColor: AppColors.surfaceVariant,
+      baseColor: dark ? AppNight.surface : AppColors.border,
+      highlightColor: dark ? AppNight.border : AppColors.surfaceVariant,
       child: Container(
         height: height,
         width: width ?? double.infinity,
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: colors.card,
           borderRadius: BorderRadius.circular(radius),
         ),
       ),

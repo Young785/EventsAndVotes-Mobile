@@ -4,6 +4,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../../core/services/notification_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/list_response_utils.dart';
+import 'shimmer_card.dart';
 
 class NotificationsSheet extends StatefulWidget {
   final VoidCallback? onCountChanged;
@@ -149,7 +150,10 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
           const Divider(height: 1),
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: ShimmerList(count: 5, itemHeight: 72),
+                  )
                 : _items.isEmpty
                     ? Center(
                         child: Text(
@@ -211,8 +215,8 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
 
                           return Material(
                             color: isUnread
-                                ? AppColors.primarySurface
-                                : AppColors.surfaceVariant,
+                                ? AppColors.primary.withValues(alpha: 0.16)
+                                : AppPalette.of(context).raised,
                             borderRadius: BorderRadius.circular(12),
                             child: InkWell(
                               onTap: isUnread ? () => _markRead(id) : null,
@@ -242,6 +246,7 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
                                                   ? FontWeight.w700
                                                   : FontWeight.w500,
                                               fontSize: 14,
+                                              color: AppPalette.of(context).text,
                                             ),
                                           ),
                                           if (message.isNotEmpty) ...[
@@ -261,9 +266,9 @@ class _NotificationsSheetState extends State<NotificationsSheet> {
                                                 DateTime.tryParse(created) ??
                                                     DateTime.now(),
                                               ),
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 10,
-                                                color: AppColors.textHint,
+                                                color: AppPalette.of(context).muted,
                                               ),
                                             ),
                                           ],

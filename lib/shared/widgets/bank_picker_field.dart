@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../core/services/bank_account_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -61,13 +62,24 @@ class _BankPickerFieldState extends State<BankPickerField> {
           suffixIcon: const Icon(Icons.arrow_drop_down_rounded),
           enabled: widget.banks.isNotEmpty,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color:
-                selected == null ? AppColors.textHint : AppColors.textPrimary,
-            fontSize: 15,
-          ),
+        child: Row(
+          children: [
+            if (selected != null) ...[
+              BankLogo(bank: selected, size: 28),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: selected == null
+                      ? AppPalette.of(context).muted
+                      : AppPalette.of(context).text,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -155,10 +167,19 @@ class _BankSearchSheetState extends State<_BankSearchSheet> {
                       final name = BankAccountService.bankDisplayName(bank);
                       final code = BankAccountService.bankCodeFrom(bank);
                       return ListTile(
-                        title: Text(name),
+                        leading: BankLogo(bank: bank, size: 36),
+                        title: Text(
+                          name,
+                          style: TextStyle(color: AppPalette.of(context).text),
+                        ),
                         subtitle: code.isNotEmpty
-                            ? Text('Code: $code',
-                                style: const TextStyle(fontSize: 12))
+                            ? Text(
+                                'Code: $code',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppPalette.of(context).muted,
+                                ),
+                              )
                             : null,
                         onTap: () => Navigator.pop(context, bank),
                       );
@@ -166,6 +187,51 @@ class _BankSearchSheetState extends State<_BankSearchSheet> {
                   ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class BankLogo extends StatelessWidget {
+  final Map<String, dynamic> bank;
+  final double size;
+
+  const BankLogo({super.key, required this.bank, this.size = 36});
+
+  @override
+  Widget build(BuildContext context) {
+    final url = BankAccountService.bankLogoUrl(bank);
+    final name = BankAccountService.bankDisplayName(bank);
+    final letter = name.isEmpty ? 'B' : name[0].toUpperCase();
+    final fallback = Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        letter,
+        style: TextStyle(
+          color: AppColors.primary,
+          fontWeight: FontWeight.w800,
+          fontSize: size * 0.4,
+        ),
+      ),
+    );
+
+    if (url == null) return fallback;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: CachedNetworkImage(
+        imageUrl: url,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        placeholder: (_, __) => fallback,
+        errorWidget: (_, __, ___) => fallback,
       ),
     );
   }

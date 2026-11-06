@@ -241,7 +241,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const SizedBox(height: 6),
                           _buildWelcomeBanner(auth),
                           _buildStatsGrid(),
-                          _buildReferralCard(),
                           _buildTabBar(),
                           _buildTabContent(),
                           const SizedBox(height: 120),
@@ -402,7 +401,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: item['bg'] as Color,
+                    color: (item['color'] as Color).withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -463,7 +462,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.primarySurface,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppColors.primary.withValues(alpha: 0.16)
+                  : AppColors.primarySurface,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
             ),
@@ -531,7 +532,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.primarySurface,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.primary.withValues(alpha: 0.16)
+                          : AppColors.primarySurface,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Row(
@@ -625,7 +628,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       duration: const Duration(milliseconds: 220),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
-                        color: active ? AppColors.white : Colors.transparent,
+                        color: active ? AppPalette.of(context).card : Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow:
                             active
@@ -642,13 +645,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         e.value,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight:
                               active ? FontWeight.w700 : FontWeight.w500,
-                          color:
-                              active
-                                  ? AppColors.textPrimary
-                                  : AppColors.textSecondary,
+                          color: active
+                              ? AppPalette.of(context).text
+                              : AppPalette.of(context).muted,
                         ),
                       ),
                     ),
@@ -688,7 +690,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {'label': 'Vote Purchase', 'value': '${rates['vote_purchase'] ?? 5}%'},
     ];
 
-    return Padding(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildReferralCard(),
+        Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -759,6 +765,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildRecentActivity(stats['recent_referrals'] as List? ?? []),
         ],
       ),
+        ),
+      ],
     );
   }
 
