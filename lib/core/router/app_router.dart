@@ -72,7 +72,7 @@ bool _requiresUserAuth(String loc) =>
 
 String _authenticatedHome(AuthProvider auth) {
   if (auth.needsVerification) return '/verification';
-  return '/dashboard';
+  return '/';
 }
 
 GoRouter createRouter(
@@ -134,7 +134,7 @@ GoRouter createRouter(
       if (isAuth &&
           !authProvider.needsVerification &&
           _isVerificationRoute(loc)) {
-        return '/dashboard';
+        return '/';
       }
 
       if (isAuth &&
@@ -148,7 +148,7 @@ GoRouter createRouter(
       if (_isAdminRoute(loc)) {
         final user = authProvider.user;
         if (!isAuth || user == null || !user.isAdmin) {
-          return isAuth ? '/dashboard' : '/';
+          return isAuth ? '/' : '/login';
         }
         if (loc.contains('/events') &&
             !user.canManageEvents &&

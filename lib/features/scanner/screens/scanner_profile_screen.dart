@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/scanner_session_provider.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../shared/widgets/app_alert.dart';
 import '../theme/scanner_theme.dart';
 import '../widgets/bouncer_avatar.dart';
 import '../widgets/scanner_event_banner.dart';
@@ -34,26 +35,14 @@ class _ScannerProfileScreenState extends State<ScannerProfileScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Leave scanner mode?'),
-        content: const Text(
-          'You will need your host token again to scan tickets at the gate.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE74C3C)),
-            child: const Text('Exit'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmModal(
+      context,
+      title: 'Leave scanner mode?',
+      message: 'You will need your host token again to scan tickets at the gate.',
+      confirmLabel: 'Exit',
+      cancelLabel: 'Stay',
+      destructive: true,
+      icon: Icons.logout_rounded,
     );
 
     if (confirmed != true || !context.mounted) return;

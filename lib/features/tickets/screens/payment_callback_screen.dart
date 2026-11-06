@@ -95,8 +95,8 @@ class _PaymentCallbackScreenState extends State<PaymentCallbackScreen> {
                     style: AppTextStyles.tone(AppTextStyles.bodyMedium, context, muted: true), textAlign: TextAlign.center),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () => context.go('/dashboard'),
-                  child: const Text('Go to Dashboard'),
+                  onPressed: () => context.go('/'),
+                  child: const Text('Go to Home'),
                 ),
               ],
             ],

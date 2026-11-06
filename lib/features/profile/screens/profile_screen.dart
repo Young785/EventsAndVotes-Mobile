@@ -73,31 +73,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _logout() async {
     if (!mounted) return;
     final rootContext = context;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppPalette.of(context).surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Sign Out',
-          style: TextStyle(fontWeight: FontWeight.w700, color: AppPalette.of(context).text),
-        ),
-        content: Text(
-          'Are you sure you want to sign out?',
-          style: TextStyle(color: AppPalette.of(context).muted),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Sign Out'),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmModal(
+      context,
+      title: 'Sign out',
+      message: 'You will need to sign in again to see your tickets, votes, and wallet.',
+      confirmLabel: 'Sign out',
+      cancelLabel: 'Stay',
+      destructive: true,
+      icon: Icons.logout_rounded,
     );
     if (confirmed == true && rootContext.mounted) {
       await signOutUser(rootContext);
@@ -164,8 +147,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
 
+    final dark = Theme.of(context).brightness == Brightness.dark;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: AppPalette.of(context).background,
         body: !auth.isAuthenticated
@@ -177,12 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverToBoxAdapter(
-                      child: _loading
-                          ? const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: ShimmerList(count: 4, itemHeight: 80),
-                            )
-                          : _buildContent(auth),
+                      child: _loading ? _loadingBody() : _buildContent(auth),
                     ),
                   ],
                 ),
@@ -216,14 +196,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _loadingBody() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 24, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: const [
+          Align(child: ShimmerCard(height: 84, width: 84, radius: 42)),
+          SizedBox(height: 16),
+          Align(child: ShimmerCard(height: 18, width: 160, radius: 8)),
+          SizedBox(height: 16),
+          ShimmerCard(height: 72, radius: 18),
+          SizedBox(height: 16),
+          ShimmerCard(height: 140, radius: 18),
+        ],
+      ),
+    );
+  }
+
   Widget _buildContent(AuthProvider auth) {
     final user = auth.user;
     final code = _referralCode(user);
     final balance = _balance(user);
+    final theme = context.watch<ThemeController>();
+    final top = MediaQuery.paddingOf(context).top;
 
     return Column(
       children: [
-        const SizedBox(height: 12),
+        SizedBox(height: top + 8),
         Text(
           'Profile',
           style: TextStyle(
@@ -248,40 +248,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _subtitle(user),
           style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13),
         ),
-        const SizedBox(height: 14),
-        GestureDetector(
-          onTap: () => setState(() => _showTopUp = !_showTopUp),
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: AppPalette.of(context).card,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppPalette.of(context).border),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.account_balance_wallet_outlined, color: AppColors.primaryLight, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  'Wallet Balance: ₦${balance.toStringAsFixed(2)}',
-                  style: TextStyle(
-                    color: AppPalette.of(context).text,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13,
-                  ),
-                ),
-                Icon(Icons.chevron_right_rounded, color: AppPalette.of(context).muted, size: 18),
-              ],
-            ),
-          ),
-        ),
+        const SizedBox(height: 16),
+        _walletCard(balance),
         if (_showTopUp) ...[
           const SizedBox(height: 12),
           _topUpCard(),
         ],
+        const SizedBox(height: 20),
+        _sectionLabel('Account'),
+        _menuCard([
+          _MenuItem(
+            icon: Icons.edit_outlined,
+            title: 'Edit Profile',
+            subtitle: 'Name, phone and photo',
+            onTap: () => context.push('/profile/edit'),
+          ),
+          _MenuItem(
+            icon: Icons.lock_outline_rounded,
+            title: 'Change Password',
+            onTap: () => context.push('/change-password'),
+          ),
+        ]),
         const SizedBox(height: 16),
+        _sectionLabel('Your activity'),
         _menuCard([
           _MenuItem(
             icon: Icons.confirmation_number_outlined,
@@ -302,20 +291,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onTap: () => context.go('/events'),
           ),
           _MenuItem(
-            icon: Icons.share_outlined,
+            icon: Icons.card_giftcard_outlined,
             title: 'Referral Rewards',
             subtitle: code.isEmpty ? 'Open your rewards' : 'Code: $code',
             onTap: () => context.go('/dashboard'),
           ),
         ]),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
+        _sectionLabel('Preferences'),
         _menuCard([
           _MenuItem(
             icon: Icons.brightness_6_outlined,
             title: 'Appearance',
-            subtitle: context.watch<ThemeController>().isDark ? 'Dark mode' : 'Light mode',
+            subtitle: theme.isDark ? 'Dark mode' : 'Light mode',
             trailing: Switch.adaptive(
-              value: context.watch<ThemeController>().isDark,
+              value: theme.isDark,
               activeTrackColor: AppColors.primary,
               onChanged: (value) => context.read<ThemeController>().setDark(value),
             ),
@@ -323,24 +313,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _MenuItem(
             icon: Icons.notifications_none_rounded,
             title: 'Notifications',
-            subtitle: 'Event alerts & vote tally updates',
+            subtitle: 'Event alerts and vote tally updates',
             trailing: Switch.adaptive(
               value: _alertsOn,
               activeTrackColor: AppColors.primary,
               onChanged: _setAlerts,
             ),
           ),
+        ]),
+        const SizedBox(height: 16),
+        _sectionLabel('More'),
+        _menuCard([
           if (user?.isAdmin == true)
             _MenuItem(
               icon: Icons.admin_panel_settings_outlined,
               title: 'Vendor Portal',
-              subtitle: 'Organizer tooling & stage rosters',
+              subtitle: 'Organizer tooling and stage rosters',
               onTap: () => context.push('/admin/dashboard'),
             ),
           _MenuItem(
             icon: Icons.qr_code_scanner_rounded,
             title: 'Login as Scanner',
-            subtitle: 'Gate staff, offline ticket database sync',
+            subtitle: 'Gate staff and offline ticket sync',
             onTap: () => context.push('/scanner/login'),
           ),
           _MenuItem(
@@ -348,28 +342,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: 'Help Center & Policies',
             onTap: _openHelp,
           ),
-          _MenuItem(
-            icon: Icons.edit_outlined,
-            title: 'Edit Profile',
-            subtitle: 'Name, phone and photo',
-            onTap: () => context.push('/profile/edit'),
-          ),
-          _MenuItem(
-            icon: Icons.lock_outline_rounded,
-            title: 'Change Password',
-            onTap: () => context.push('/change-password'),
-          ),
         ]),
-        const SizedBox(height: 8),
-        TextButton(
-          onPressed: _logout,
-          child: const Text(
-            'Sign Out',
-            style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: OutlinedButton.icon(
+            onPressed: _logout,
+            icon: const Icon(Icons.logout_rounded, size: 18),
+            label: const Text('Sign out'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.error,
+              side: const BorderSide(color: AppColors.error),
+              minimumSize: const Size.fromHeight(50),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+            ),
           ),
         ),
         const SizedBox(height: 120),
       ],
+    );
+  }
+
+  Widget _walletCard(double balance) {
+    return GestureDetector(
+      onTap: () => setState(() => _showTopUp = !_showTopUp),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          gradient: AppColors.cardGradient,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Wallet balance',
+                    style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '₦${balance.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 22),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _sectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: AppPalette.of(context).muted,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.4,
+          ),
+        ),
+      ),
     );
   }
 

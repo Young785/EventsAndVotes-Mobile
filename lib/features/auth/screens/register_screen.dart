@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (!mounted) return;
     if (ok) {
-      context.go(auth.needsVerification ? '/verification' : '/dashboard');
+      context.go(auth.needsVerification ? '/verification' : '/');
     } else {
       _showError(auth.error ?? 'Registration failed');
     }

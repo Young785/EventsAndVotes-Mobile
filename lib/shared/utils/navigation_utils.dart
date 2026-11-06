@@ -27,7 +27,7 @@ Future<void> signOutUser(BuildContext context) async {
 String _homeRoute(BuildContext context) {
   final auth = context.read<AuthProvider>();
   if (auth.isAuthenticated) {
-    return auth.needsVerification ? '/verification' : '/dashboard';
+    return auth.needsVerification ? '/verification' : '/';
   }
   return '/';
 }

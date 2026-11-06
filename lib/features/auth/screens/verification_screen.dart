@@ -58,7 +58,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
     if (ok) {
       _showMessage('Email verified successfully!');
-      context.go('/dashboard');
+      context.go('/');
     } else {
       _showMessage(auth.error ?? 'Invalid verification code', isError: true);
     }

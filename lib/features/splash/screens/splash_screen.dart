@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (!auth.onboardingCompleted) {
       context.go('/onboarding');
     } else if (auth.isAuthenticated) {
-      context.go(auth.needsVerification ? '/verification' : '/dashboard');
+      context.go(auth.needsVerification ? '/verification' : '/');
     } else {
       context.go('/login');
     }
