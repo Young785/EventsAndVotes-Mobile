@@ -4,6 +4,7 @@ import '../providers/scanner_session_provider.dart';
 import '../theme/scanner_theme.dart';
 import '../scanner_tab_scope.dart';
 import 'scanner_activity_sheet.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class ScannerHeader extends StatelessWidget {
   final String title;
@@ -74,7 +75,7 @@ class ScannerHeader extends StatelessWidget {
             onTap: () async {
               await scanner.refreshSession();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                showTopAlert(context, 
                   const SnackBar(
                     content: Text('Session refreshed'),
                     behavior: SnackBarBehavior.floating,

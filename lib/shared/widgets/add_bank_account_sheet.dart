@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/bank_account_service.dart';
 import '../../core/theme/app_theme.dart';
 import 'bank_picker_field.dart';
+import 'app_alert.dart';
 
 class AddBankAccountSheet extends StatefulWidget {
   const AddBankAccountSheet({super.key});
@@ -212,7 +213,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
       );
       if (mounted) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(content: Text('Bank account saved')),
         );
       }
@@ -224,7 +225,7 @@ class _AddBankAccountSheetState extends State<AddBankAccountSheet> {
   }
 
   void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    showTopAlert(context, SnackBar(content: Text(msg)));
   }
 
   @override

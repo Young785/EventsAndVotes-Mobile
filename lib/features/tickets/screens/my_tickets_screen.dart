@@ -18,6 +18,7 @@ import '../../../features/auth/providers/auth_provider.dart';
 import '../models/ticket_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/ticket_qr_image.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class MyTicketsScreen extends StatefulWidget {
   const MyTicketsScreen({super.key});
@@ -905,7 +906,7 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        showTopAlert(context, SnackBar(
           content: Text('Could not share: $e'),
           backgroundColor: AppColors.error,
         ));
@@ -930,7 +931,7 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
       );
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        showTopAlert(context, SnackBar(
           content: Text('Download failed: $e'),
           backgroundColor: AppColors.error,
         ));
@@ -1006,7 +1007,7 @@ class _QrBottomSheetState extends State<_QrBottomSheet> {
               onPressed: () {
                 Clipboard.setData(
                     ClipboardData(text: widget.ticket.entryCode));
-                ScaffoldMessenger.of(context).showSnackBar(
+                showTopAlert(context, 
                     const SnackBar(content: Text('Entry code copied')));
               },
               icon: const Icon(Icons.copy_rounded, size: 14),

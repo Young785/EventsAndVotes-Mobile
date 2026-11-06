@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -61,6 +62,7 @@ class MainShell extends StatelessWidget {
       value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: colors.background,
+        extendBody: true,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -155,34 +157,24 @@ class _ShellHeaderState extends State<_ShellHeader> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppPalette.of(context).raised,
-                  borderRadius: BorderRadius.circular(22),
+              if (auth.isAuthenticated)
+                _NotificationBell(
+                  unreadCount: _unreadCount,
+                  onTap: _openNotifications,
+                )
+              else
+                IconButton(
+                  onPressed: () => context.go('/login'),
+                  icon: Icon(
+                    Icons.notifications_none_rounded,
+                    color: AppPalette.of(context).muted,
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (auth.isAuthenticated)
-                      _NotificationBell(
-                        unreadCount: _unreadCount,
-                        onTap: _openNotifications,
-                      )
-                    else
-                      IconButton(
-                        onPressed: () => context.go('/login'),
-                        icon: const Icon(Icons.notifications_none_rounded),
-                        color: AppPalette.of(context).muted,
-                        iconSize: 22,
-                      ),
-                    _ProfileChip(
-                      signedIn: auth.isAuthenticated,
-                      onTap: () => context.go(
-                        auth.isAuthenticated ? '/profile' : '/login',
-                      ),
-                    ),
-                  ],
+              const SizedBox(width: 10),
+              _ProfileChip(
+                signedIn: auth.isAuthenticated,
+                onTap: () => context.go(
+                  auth.isAuthenticated ? '/profile' : '/login',
                 ),
               ),
             ],
@@ -225,44 +217,50 @@ class _NotificationBellState extends State<_NotificationBell> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Icon(
-            Icons.notifications_outlined,
-            color: AppPalette.of(context).text,
-            size: 22,
-          )
-              .animate(key: ValueKey(_shakeTick))
-              .shake(
-                duration: 900.ms,
-                hz: 2,
-                rotation: 0.04,
-                curve: Curves.easeInOut,
-              ),
-          if (widget.unreadCount > 0)
-            Positioned(
-              right: -4,
-              top: -4,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                decoration: const BoxDecoration(
-                  color: AppColors.error,
-                  shape: BoxShape.circle,
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Icon(
+              Icons.notifications_outlined,
+              color: AppPalette.of(context).text,
+              size: 24,
+            )
+                .animate(key: ValueKey(_shakeTick))
+                .shake(
+                  duration: 900.ms,
+                  hz: 2,
+                  rotation: 0.04,
+                  curve: Curves.easeInOut,
                 ),
-                child: Text(
-                  widget.unreadCount > 9 ? '9+' : '${widget.unreadCount}',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
+            if (widget.unreadCount > 0)
+              Positioned(
+                right: 0,
+                top: 2,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                  decoration: const BoxDecoration(
+                    color: AppColors.error,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    widget.unreadCount > 9 ? '9+' : '${widget.unreadCount}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -284,7 +282,7 @@ class _ProfileChip extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(2, 6, 8, 6),
         child: CircleAvatar(
-          radius: 14,
+          radius: 16,
           backgroundColor: signedIn ? AppColors.primary : AppPalette.of(context).surface,
           child: Icon(
             Icons.person_rounded,
@@ -337,20 +335,32 @@ class _ShellBottomNav extends StatelessWidget {
       ),
     ];
 
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final glass = dark
+        ? const Color(0xFF1A2236).withValues(alpha: 0.62)
+        : Colors.white.withValues(alpha: 0.62);
+    final line = dark
+        ? Colors.white.withValues(alpha: 0.14)
+        : Colors.white.withValues(alpha: 0.8);
+
     return Material(
-      color: AppPalette.of(context).background,
+      type: MaterialType.transparency,
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-          child: Container(
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppPalette.of(context).nav,
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: AppPalette.of(context).border),
-            ),
-            child: Row(
+          padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: glass,
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: line),
+                ),
+                child: Row(
               children: destinations.asMap().entries.map((entry) {
                 final i = entry.key;
                 final d = entry.value;
@@ -369,7 +379,7 @@ class _ShellBottomNav extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? AppPalette.of(context).raised
+                              ? AppColors.primary.withValues(alpha: 0.12)
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -380,7 +390,7 @@ class _ShellBottomNav extends StatelessWidget {
                               isActive ? d.activeIcon : d.icon,
                               size: 20,
                               color: isActive
-                                  ? AppColors.primaryLight
+                                  ? AppColors.primary
                                   : AppPalette.of(context).muted,
                             ),
                             const SizedBox(height: 2),
@@ -392,7 +402,7 @@ class _ShellBottomNav extends StatelessWidget {
                                     ? FontWeight.w700
                                     : FontWeight.w500,
                                 color: isActive
-                                    ? AppColors.primaryLight
+                                    ? AppColors.primary
                                     : AppPalette.of(context).muted,
                               ),
                             ),
@@ -403,6 +413,8 @@ class _ShellBottomNav extends StatelessWidget {
                   ),
                 );
               }).toList(),
+                ),
+              ),
             ),
           ),
         ),

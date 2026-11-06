@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../utils/navigation_utils.dart';
 
-/// Intercepts the system back gesture / back button so the app navigates
-/// in-app instead of closing when there is nowhere to pop on the stack.
+/// Lets a pushed page slide back. Root tabs still use the in-app back rules.
 class AppPopScope extends StatelessWidget {
   final Widget child;
   final VoidCallback? onBack;
@@ -15,8 +15,9 @@ class AppPopScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canSlideBack = GoRouter.of(context).canPop();
     return PopScope(
-      canPop: false,
+      canPop: canSlideBack,
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) return;
         if (onBack != null) {

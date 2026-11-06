@@ -10,6 +10,7 @@ import '../../../features/events/models/event_model.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/detail_back_button.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class BuyTicketsScreen extends StatefulWidget {
   final String eventId;
@@ -76,7 +77,7 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
         );
       }
@@ -98,13 +99,13 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
 
   Future<void> _purchase() async {
     if (_event == null || _totalQty == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         const SnackBar(content: Text('Select at least one ticket')),
       );
       return;
     }
     if (_nameCtrl.text.isEmpty || _emailCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         const SnackBar(content: Text('Name and email are required')),
       );
       return;
@@ -140,7 +141,7 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
 
       if (paid) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(
             content: Text('Payment successful! Your tickets are ready.'),
             backgroundColor: AppColors.success,
@@ -150,7 +151,7 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: AppColors.error,

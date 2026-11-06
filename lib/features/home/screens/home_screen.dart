@@ -12,7 +12,9 @@ import '../../../core/services/votes_service.dart';
 import '../../../core/services/events_service.dart';
 import '../../../core/utils/list_response_utils.dart';
 import '../../../shared/widgets/shimmer_card.dart';
+import '../../../shared/widgets/app_loader.dart';
 import '../../../shared/widgets/status_badge.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -87,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     if (votesFailed && eventsFailed && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         const SnackBar(content: Text('Failed to load home data')),
       );
     }
@@ -162,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildVotesSection(),
                   _sectionTitle('Upcoming Events', '/events'),
                   _buildEventsSection(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
@@ -236,9 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: AppPalette.of(context).surface,
           borderRadius: BorderRadius.circular(22),
         ),
-        child: const Center(
-          child: CircularProgressIndicator(color: AppColors.primary),
-        ),
+        child: const Center(child: AppLoader()),
       );
     }
 

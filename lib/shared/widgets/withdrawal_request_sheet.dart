@@ -4,6 +4,7 @@ import '../../core/services/withdrawal_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/json_parse_utils.dart';
 import 'add_bank_account_sheet.dart';
+import 'app_alert.dart';
 
 class WithdrawalRequestSheet extends StatefulWidget {
   const WithdrawalRequestSheet({super.key});
@@ -143,7 +144,7 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
       );
       if (mounted) {
         Navigator.pop(context, true);
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(content: Text('Withdrawal request submitted')),
         );
       }
@@ -155,7 +156,7 @@ class _WithdrawalRequestSheetState extends State<WithdrawalRequestSheet> {
   }
 
   void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    showTopAlert(context, SnackBar(content: Text(msg)));
   }
 
   @override

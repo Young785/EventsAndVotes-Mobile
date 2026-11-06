@@ -13,6 +13,7 @@ import '../models/vote_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/detail_back_button.dart';
 import '../../../shared/widgets/status_badge.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class VoteDetailScreen extends StatefulWidget {
   final String slug;
@@ -65,7 +66,7 @@ class _VoteDetailScreenState extends State<VoteDetailScreen> {
 
   void _showSnack(String message, {bool isError = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
+    showTopAlert(context, 
       SnackBar(
         content: Text(message),
         backgroundColor: isError ? AppColors.error : AppColors.success,

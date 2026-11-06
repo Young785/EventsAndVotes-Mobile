@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../features/auth/providers/auth_provider.dart';
+import '../widgets/app_alert.dart';
 
 DateTime? _lastRootBackPress;
 bool _handlingBack = false;
@@ -140,7 +141,7 @@ void _maybeExitApp(BuildContext context) {
   if (_lastRootBackPress == null ||
       now.difference(_lastRootBackPress!) > const Duration(seconds: 2)) {
     _lastRootBackPress = now;
-    ScaffoldMessenger.of(context).showSnackBar(
+    showTopAlert(context, 
       SnackBar(
         content: const Text('Press back again to exit'),
         duration: const Duration(seconds: 2),

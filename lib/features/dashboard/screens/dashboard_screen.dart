@@ -13,6 +13,7 @@ import '../../../core/utils/json_parse_utils.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/withdrawal_request_sheet.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -117,7 +118,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _transactions = [];
           _loading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(content: Text('Failed to load rewards data')),
         );
       }
@@ -157,14 +158,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _copyCode() {
     if (_referralCode.isEmpty) return;
     Clipboard.setData(ClipboardData(text: _referralCode));
-    ScaffoldMessenger.of(context).showSnackBar(
+    showTopAlert(context, 
       const SnackBar(content: Text('Referral code copied!')),
     );
   }
 
   void _copyLink() {
     Clipboard.setData(ClipboardData(text: _referralLink));
-    ScaffoldMessenger.of(context).showSnackBar(
+    showTopAlert(context, 
       SnackBar(
         content: const Text('Referral link copied!'),
         backgroundColor: AppColors.success,
@@ -1555,7 +1556,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onPressed: () async {
                   final amount = double.tryParse(amountCtrl.text) ?? 0;
                   if (amount < 1000) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    showTopAlert(context, 
                       const SnackBar(
                         content: Text('Minimum withdrawal is ₦1,000'),
                         backgroundColor: AppColors.error,
@@ -1564,7 +1565,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     return;
                   }
                   if (amount > balance) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    showTopAlert(context, 
                       const SnackBar(
                         content: Text('Insufficient balance'),
                         backgroundColor: AppColors.error,
@@ -1574,7 +1575,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   }
                   Navigator.pop(context);
                   // Show loading
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  showTopAlert(context, 
                     const SnackBar(
                       content: Row(
                         children: [
@@ -1597,7 +1598,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // Simulate API call
                   await Future.delayed(const Duration(seconds: 2));
                   if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    showTopAlert(context, 
                       const SnackBar(
                         content: Text(
                           'Withdrawal request submitted successfully!',

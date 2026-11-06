@@ -4,6 +4,7 @@ import '../../../core/services/admin_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class AdminCreateEventScreen extends StatefulWidget {
   const AdminCreateEventScreen({super.key});
@@ -41,7 +42,7 @@ class _AdminCreateEventScreenState extends State<AdminCreateEventScreen> {
       });
       if (mounted) {
         final id = event['id']?.toString();
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(
             content: Text('Event created'),
             backgroundColor: AppColors.success,
@@ -55,7 +56,7 @@ class _AdminCreateEventScreenState extends State<AdminCreateEventScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
         );
       }

@@ -8,10 +8,12 @@ import '../../../core/services/votes_service.dart';
 import '../../../core/utils/list_response_utils.dart';
 import '../models/vote_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
+import '../../../shared/widgets/app_loader.dart';
 import '../../../shared/widgets/app_search_field.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/layout_view_toggle.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class VotesListScreen extends StatefulWidget {
   const VotesListScreen({super.key});
@@ -88,7 +90,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
           if (reset) _votes = [];
           _loading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(content: Text('Failed to load votes')),
         );
       }
@@ -137,7 +139,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
             else
               _gridView
                   ? SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                       sliver: SliverGrid(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -149,12 +151,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
                         delegate: SliverChildBuilderDelegate(
                           (context, i) {
                             if (i >= _votes.length) {
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.primary,
-                                ),
-                              );
+                              return const Center(child: AppLoader(size: 28, strokeWidth: 3));
                             }
                             return _VoteGridCard(vote: _votes[i]);
                           },
@@ -164,7 +161,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
                       ),
                     )
                   : SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                       sliver: SliverList.separated(
                         itemCount: _votes.length + (_page < _lastPage ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -172,12 +169,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
                           if (i == _votes.length) {
                             return const Padding(
                               padding: EdgeInsets.all(16),
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: AppColors.primary,
-                                  strokeWidth: 2,
-                                ),
-                              ),
+                              child: Center(child: AppLoader(size: 28, strokeWidth: 3)),
                             );
                           }
                           return _VoteListCard(vote: _votes[i])

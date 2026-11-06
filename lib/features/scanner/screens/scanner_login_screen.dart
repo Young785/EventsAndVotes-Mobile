@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../providers/scanner_session_provider.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class ScannerLoginScreen extends StatefulWidget {
   const ScannerLoginScreen({super.key});
@@ -31,7 +32,7 @@ class _ScannerLoginScreenState extends State<ScannerLoginScreen> {
     if (ok) {
       context.go('/scanner/home');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         SnackBar(
           content: Text(scanner.error ?? 'Could not open scanner'),
           backgroundColor: AppColors.error,

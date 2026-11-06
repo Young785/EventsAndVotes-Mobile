@@ -6,6 +6,7 @@ import '../models/offline_ticket.dart';
 import '../providers/scanner_session_provider.dart';
 import '../theme/scanner_theme.dart';
 import '../widgets/scanner_event_banner.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class ScannerSyncScreen extends StatefulWidget {
   const ScannerSyncScreen({super.key});
@@ -40,7 +41,7 @@ class _ScannerSyncScreenState extends State<ScannerSyncScreen> {
     if (!mounted) return;
     final err = scanner.syncError;
     if (err != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         SnackBar(
           content: Text(err),
           backgroundColor: const Color(0xFFE74C3C),
@@ -48,7 +49,7 @@ class _ScannerSyncScreenState extends State<ScannerSyncScreen> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         SnackBar(
           content: Text(
             '${scanner.offlineTicketCount} paid tickets saved on this device',

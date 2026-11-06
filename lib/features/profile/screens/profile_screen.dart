@@ -14,6 +14,7 @@ import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/models/user_model.dart';
 import '../../../shared/utils/navigation_utils.dart';
 import '../../../shared/widgets/shimmer_card.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -56,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _profile = null;
           _loading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(content: Text('Failed to load profile')),
         );
       }
@@ -138,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _chooseTopUp(int amount) {
     setState(() => _topUpAmount = amount);
-    ScaffoldMessenger.of(context).showSnackBar(
+    showTopAlert(context, 
       SnackBar(
         content: Text(
           'Wallet top-up of ₦${amount.toStringAsFixed(0)} is not available yet. '
@@ -153,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final uri = Uri.parse(AppConstants.frontendUrl);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         const SnackBar(content: Text('Could not open help')),
       );
     }
@@ -367,7 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w700),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 120),
       ],
     );
   }

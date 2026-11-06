@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../providers/auth_provider.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class VerificationScreen extends StatefulWidget {
   const VerificationScreen({super.key});
@@ -78,7 +79,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
   }
 
   void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    showTopAlert(context, 
       SnackBar(
         content: Text(message, maxLines: 3),
         backgroundColor: isError ? AppColors.error : AppColors.success,

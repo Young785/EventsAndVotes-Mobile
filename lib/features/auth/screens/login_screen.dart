@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -39,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (ok) {
       context.go(auth.needsVerification ? '/verification' : '/dashboard');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         SnackBar(
           content: Text(
             auth.error ?? 'Login failed. Please try again.',

@@ -9,6 +9,7 @@ import '../models/event_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
 import '../../../shared/widgets/detail_back_button.dart';
 import '../../../shared/widgets/status_badge.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -64,7 +65,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final tier = _selected;
     if (event == null) return;
     if (tier == null || !tier.isActive) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         const SnackBar(content: Text('Choose a ticket tier to continue')),
       );
       return;

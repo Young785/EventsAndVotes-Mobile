@@ -6,6 +6,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/services/admin_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../features/events/models/event_model.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class AdminEventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -52,7 +53,7 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
     try {
       await _admin.publishEvent(widget.eventId);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(
             content: Text('Event published'),
             backgroundColor: AppColors.success,
@@ -62,7 +63,7 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
         );
       }
@@ -188,7 +189,7 @@ class _AdminEventDetailScreenState extends State<AdminEventDetailScreen> {
         _load();
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          showTopAlert(context, 
             SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error),
           );
         }

@@ -6,6 +6,7 @@ import '../../../core/network/api_client.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/utils/navigation_utils.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -49,7 +50,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
       if (response.data['status'] == 'success') {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
+          showTopAlert(context, 
             const SnackBar(
               content: Text('Password changed successfully!'),
               backgroundColor: AppColors.success,
@@ -64,7 +65,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: AppColors.error,

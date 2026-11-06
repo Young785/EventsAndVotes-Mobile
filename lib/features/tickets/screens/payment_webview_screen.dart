@@ -5,6 +5,7 @@ import '../../../core/services/tickets_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/paystack_inline_html.dart';
 import '../../../core/utils/payment_url_utils.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class PaymentWebViewScreen extends StatefulWidget {
   final String? paymentUrl;
@@ -126,7 +127,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
       if (mounted) Navigator.of(context, rootNavigator: true).pop(true);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(
             content: Text(e.toString().replaceAll('Exception: ', '')),
             backgroundColor: AppColors.error,

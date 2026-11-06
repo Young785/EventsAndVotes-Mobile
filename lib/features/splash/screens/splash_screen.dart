@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/app_loader.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -80,13 +81,9 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ).animate().fadeIn(delay: 300.ms, duration: 600.ms),
             const SizedBox(height: 48),
-            const SizedBox(
-              width: 40,
-              height: 40,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+            const AppLoader(
+              color: Colors.white,
+              trackColor: Color(0x55FFFFFF),
             ).animate().fadeIn(delay: 400.ms, duration: 600.ms),
           ],
         ),

@@ -11,6 +11,7 @@ import '../../../features/auth/providers/auth_provider.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/utils/navigation_utils.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -81,7 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _avatarUrl = url ?? pickedFile.path;
           });
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            showTopAlert(context, 
               const SnackBar(
                 content: Text('Profile photo updated'),
                 backgroundColor: AppColors.success,
@@ -90,7 +91,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           }
         } catch (e) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            showTopAlert(context, 
               SnackBar(
                 content: Text('Failed to upload photo: $e'),
                 backgroundColor: AppColors.error,
@@ -103,7 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(
             content: Text('Failed to pick image'),
             backgroundColor: AppColors.error,
@@ -128,7 +129,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await context.read<AuthProvider>().initialize();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(
             content: Text('Profile updated successfully!'),
             backgroundColor: AppColors.success,
@@ -138,7 +139,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           SnackBar(
             content: Text('Failed to update profile: ${e.toString()}'),
             backgroundColor: AppColors.error,

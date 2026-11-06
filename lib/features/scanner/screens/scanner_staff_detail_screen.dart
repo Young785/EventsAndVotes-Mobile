@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../providers/scanner_session_provider.dart';
 import '../theme/scanner_theme.dart';
 import '../widgets/bouncer_avatar.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class ScannerStaffDetailScreen extends StatelessWidget {
   const ScannerStaffDetailScreen({super.key});
@@ -596,7 +597,7 @@ class _ReportBugSheetState extends State<_ReportBugSheet> {
   Future<void> _submit() async {
     final text = _ctrl.text.trim();
     if (text.length < 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      showTopAlert(context, 
         const SnackBar(
           content: Text('Please describe the issue in a few words'),
           behavior: SnackBarBehavior.floating,
@@ -609,7 +610,6 @@ class _ReportBugSheetState extends State<_ReportBugSheet> {
     await Future.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
 
-    final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     final body = Uri.encodeComponent(
       'Scanner bug report\n'
@@ -623,18 +623,20 @@ class _ReportBugSheetState extends State<_ReportBugSheet> {
     );
 
     setState(() => _sending = false);
-    navigator.pop();
 
     if (await canLaunchUrl(uri)) {
+      navigator.pop();
       await launchUrl(uri);
     } else {
       await Clipboard.setData(ClipboardData(text: text));
-      messenger.showSnackBar(
+      if (!mounted) return;
+      showTopAlert(
+        context,
         const SnackBar(
           content: Text('Report copied — email support@bizinvestify.com'),
-          behavior: SnackBarBehavior.floating,
         ),
       );
+      navigator.pop();
     }
   }
 

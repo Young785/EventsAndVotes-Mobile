@@ -8,10 +8,12 @@ import '../../../core/services/events_service.dart';
 import '../../../core/utils/list_response_utils.dart';
 import '../models/event_model.dart';
 import '../../../shared/widgets/shimmer_card.dart';
+import '../../../shared/widgets/app_loader.dart';
 import '../../../shared/widgets/app_search_field.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/layout_view_toggle.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/app_alert.dart';
 
 class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
@@ -88,7 +90,7 @@ class _EventsScreenState extends State<EventsScreen> {
           if (reset) _events = [];
           _loading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
+        showTopAlert(context, 
           const SnackBar(content: Text('Failed to load events')),
         );
       }
@@ -137,7 +139,7 @@ class _EventsScreenState extends State<EventsScreen> {
             else
               _gridView
                   ? SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                       sliver: SliverGrid(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -150,10 +152,7 @@ class _EventsScreenState extends State<EventsScreen> {
                           (context, i) {
                             if (i >= _events.length) {
                               return const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.primary,
-                                ),
+                                child: AppLoader(size: 28, strokeWidth: 3),
                               );
                             }
                             return _EventGridCard(event: _events[i]);
@@ -164,7 +163,7 @@ class _EventsScreenState extends State<EventsScreen> {
                       ),
                     )
                   : SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                       sliver: SliverList.separated(
                         itemCount: _events.length + (_page < _lastPage ? 1 : 0),
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
@@ -173,10 +172,7 @@ class _EventsScreenState extends State<EventsScreen> {
                             return const Padding(
                               padding: EdgeInsets.all(16),
                               child: Center(
-                                child: CircularProgressIndicator(
-                                  color: AppColors.primary,
-                                  strokeWidth: 2,
-                                ),
+                                child: AppLoader(size: 28, strokeWidth: 3),
                               ),
                             );
                           }

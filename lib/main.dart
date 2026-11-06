@@ -8,6 +8,7 @@ import 'core/theme/theme_controller.dart';
 import 'core/router/app_router.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/scanner/providers/scanner_session_provider.dart';
+import 'shared/widgets/app_loader.dart';
 import 'shared/widgets/app_pop_scope.dart';
 
 void main() async {
@@ -98,14 +99,25 @@ class _EventsVotesAppState extends State<EventsVotesApp> {
             ),
           ),
           // go_router can briefly pass a null child during redirects — never show a blank screen
-          child: AppPopScope(
-            child: child ??
-                const Scaffold(
-                  backgroundColor: Colors.white,
-                  body: Center(
-                    child: CircularProgressIndicator(),
+          child: Listener(
+            behavior: HitTestBehavior.translucent,
+            onPointerDown: (event) {
+              final focus = FocusManager.instance.primaryFocus;
+              if (focus == null || !focus.hasFocus) return;
+              final box = focus.context?.findRenderObject();
+              if (box is RenderBox && box.hasSize) {
+                final rect = box.localToGlobal(Offset.zero) & box.size;
+                if (rect.contains(event.position)) return;
+              }
+              focus.unfocus();
+            },
+            child: AppPopScope(
+              child: child ??
+                  const Scaffold(
+                    backgroundColor: Colors.white,
+                    body: Center(child: AppLoader()),
                   ),
-                ),
+            ),
           ),
         );
       },

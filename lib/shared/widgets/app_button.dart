@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import 'app_loader.dart';
 
 class AppButton extends StatelessWidget {
   final String label;
@@ -57,9 +58,11 @@ class AppButton extends StatelessWidget {
       return SizedBox(
         width: 20,
         height: 20,
-        child: CircularProgressIndicator(
+        child: AppLoader(
+          size: 20,
           strokeWidth: 2,
           color: textColor,
+          trackColor: textColor.withValues(alpha: 0.25),
         ),
       );
     }
