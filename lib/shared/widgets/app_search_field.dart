@@ -17,18 +17,19 @@ class AppSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppPalette.of(context);
     final defaults = Theme.of(context).inputDecorationTheme;
 
     return TextField(
       controller: controller,
       onSubmitted: onSubmitted,
-      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+      style: TextStyle(fontSize: 14, color: colors.text),
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textHint, size: 20),
+        prefixIcon: Icon(Icons.search_rounded, color: colors.muted, size: 20),
         suffixIcon: onClear != null
             ? IconButton(
-                icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.textHint),
+                icon: Icon(Icons.close_rounded, size: 18, color: colors.muted),
                 onPressed: onClear,
               )
             : null,

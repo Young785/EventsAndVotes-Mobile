@@ -14,8 +14,9 @@ class LayoutViewToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppPalette.of(context);
     return Material(
-      color: AppColors.white,
+      color: colors.card,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: () => onChanged(!isGrid),
@@ -25,7 +26,7 @@ class LayoutViewToggle extends StatelessWidget {
           height: 38,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colors.border),
           ),
           child: Icon(
             isGrid ? Icons.view_list_rounded : Icons.grid_view_rounded,

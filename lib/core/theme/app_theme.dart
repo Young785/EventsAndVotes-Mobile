@@ -69,6 +69,24 @@ class AppNight {
   static const Color nav = Color(0xE61A2236);
 }
 
+/// Colors for the attendee screens. Light and dark both read from here.
+class AppPalette {
+  final bool dark;
+  const AppPalette(this.dark);
+
+  factory AppPalette.of(BuildContext context) =>
+      AppPalette(Theme.of(context).brightness == Brightness.dark);
+
+  Color get background => dark ? AppNight.background : AppColors.background;
+  Color get card => dark ? AppNight.card : AppColors.white;
+  Color get text => dark ? AppNight.text : AppColors.textPrimary;
+  Color get muted => dark ? AppNight.muted : AppColors.textSecondary;
+  Color get border => dark ? AppNight.border : AppColors.border;
+  Color get surface => dark ? AppNight.surface : AppColors.surfaceVariant;
+  Color get raised => dark ? AppNight.surfaceHigh : AppColors.white;
+  Color get nav => dark ? AppNight.nav : AppColors.white;
+}
+
 class AppTextStyles {
   static const String fontFamily = 'SF Pro Display';
 
@@ -309,6 +327,42 @@ class AppTheme {
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       ),
+    );
+  }
+
+  static ThemeData get darkTheme {
+    return lightTheme.copyWith(
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: AppNight.background,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.dark,
+        primary: AppColors.primaryLight,
+        onPrimary: Colors.white,
+        surface: AppNight.card,
+        onSurface: AppNight.text,
+      ),
+      appBarTheme: lightTheme.appBarTheme.copyWith(
+        backgroundColor: AppNight.background,
+        foregroundColor: AppNight.text,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+        ),
+        titleTextStyle: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: AppNight.text,
+        ),
+      ),
+      cardTheme: lightTheme.cardTheme.copyWith(color: AppNight.card),
+      inputDecorationTheme: lightTheme.inputDecorationTheme.copyWith(
+        fillColor: AppNight.surfaceHigh,
+        hintStyle: const TextStyle(color: AppNight.muted, fontSize: 14),
+        labelStyle: const TextStyle(color: AppNight.muted, fontSize: 14),
+      ),
+      dividerColor: AppNight.border,
+      dividerTheme: const DividerThemeData(color: AppNight.border, thickness: 1, space: 0),
     );
   }
 }

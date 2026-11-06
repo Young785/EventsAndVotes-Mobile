@@ -114,7 +114,7 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppNight.background,
+      backgroundColor: AppPalette.of(context).background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () => _load(),
@@ -241,11 +241,11 @@ class _EventsScreenState extends State<EventsScreen> {
                             vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            color: active ? AppColors.primary : AppColors.white,
+                            color: active ? AppColors.primary : AppPalette.of(context).card,
                             borderRadius:
                                 BorderRadius.circular(AppSpacing.chipRadius),
                             border: Border.all(
-                              color: active ? AppColors.primary : AppColors.border,
+                              color: active ? AppColors.primary : AppPalette.of(context).border,
                             ),
                           ),
                           child: Text(
@@ -254,7 +254,7 @@ class _EventsScreenState extends State<EventsScreen> {
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color:
-                                  active ? Colors.white : AppColors.textSecondary,
+                                  active ? Colors.white : AppPalette.of(context).muted,
                             ),
                           ),
                         ),
@@ -316,9 +316,9 @@ class _EventGridCard extends StatelessWidget {
       onTap: () => context.push('/events/${event.id}'),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -357,7 +357,7 @@ class _EventGridCard extends StatelessWidget {
                         ),
                         child: Text(
                           '₦${event.minPrice.toStringAsFixed(0)}+',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -381,10 +381,10 @@ class _EventGridCard extends StatelessWidget {
                       event.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: AppPalette.of(context).text,
                       ),
                     ),
                     const Spacer(),
@@ -392,9 +392,9 @@ class _EventGridCard extends StatelessWidget {
                       event.venue,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                       ),
                     ),
                   ],
@@ -444,9 +444,9 @@ class _EventCard extends StatelessWidget {
       onTap: () => context.push('/events/${event.id}'),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -509,7 +509,7 @@ class _EventCard extends StatelessWidget {
                       ),
                       child: Text(
                         'From ₦${event.minPrice.toStringAsFixed(0)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -526,10 +526,10 @@ class _EventCard extends StatelessWidget {
                 children: [
                   Text(
                     event.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: AppPalette.of(context).text,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -537,37 +537,37 @@ class _EventCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.location_on_outlined,
                         size: 13,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           event.venue,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: AppPalette.of(context).muted,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today_outlined,
                         size: 13,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         event.startDate.length >= 10
                             ? event.startDate.substring(0, 10)
                             : event.startDate,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: AppPalette.of(context).muted,
                         ),
                       ),
                     ],
@@ -576,7 +576,7 @@ class _EventCard extends StatelessWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.confirmation_number_outlined,
                           size: 13,
                           color: AppColors.primary,
@@ -584,7 +584,7 @@ class _EventCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${event.ticketTiers.length} ticket tier${event.ticketTiers.length > 1 ? 's' : ''}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w500,

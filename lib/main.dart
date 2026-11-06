@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_controller.dart';
 import 'core/router/app_router.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/scanner/providers/scanner_session_provider.dart';
@@ -9,6 +12,10 @@ import 'shared/widgets/app_pop_scope.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (kDebugMode) {
+    debugPrint('[DEBUG] API base URL: ${AppConstants.baseUrl}');
+  }
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -24,14 +31,17 @@ void main() async {
 
   final authProvider = AuthProvider();
   final scannerProvider = ScannerSessionProvider();
+  final themeController = ThemeController();
   await authProvider.initialize();
   await scannerProvider.initialize();
+  await themeController.load();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: scannerProvider),
+        ChangeNotifierProvider.value(value: themeController),
       ],
       child: const EventsVotesApp(),
     ),
@@ -70,10 +80,14 @@ class _EventsVotesAppState extends State<EventsVotesApp> {
     context.watch<AuthProvider>();
     context.watch<ScannerSessionProvider>();
 
+    final theme = context.watch<ThemeController>();
+
     return MaterialApp.router(
       title: 'Evote',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: theme.mode,
       routerConfig: _routerWrapper.router,
       builder: (context, child) {
         return MediaQuery(

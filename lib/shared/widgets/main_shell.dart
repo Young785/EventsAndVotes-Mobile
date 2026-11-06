@@ -48,16 +48,19 @@ class MainShell extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final index = _tabIndex(location, auth);
 
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final colors = AppPalette.of(context);
+
     if (isDetail) {
-      return Scaffold(backgroundColor: AppNight.background, body: child);
+      return Scaffold(backgroundColor: colors.background, body: child);
     }
 
     final hideHeader = location == '/profile';
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
+      value: dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: AppNight.background,
+        backgroundColor: colors.background,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -117,7 +120,7 @@ class _ShellHeaderState extends State<_ShellHeader> {
   Widget build(BuildContext context) {
     final auth = widget.auth;
     return Material(
-      color: AppNight.background,
+      color: AppPalette.of(context).background,
       child: SafeArea(
         bottom: false,
         child: Container(
@@ -142,10 +145,10 @@ class _ShellHeaderState extends State<_ShellHeader> {
               Expanded(
                 child: Text(
                   widget.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
-                    color: AppNight.text,
+                    color: AppPalette.of(context).text,
                     letterSpacing: -0.2,
                   ),
                   maxLines: 1,
@@ -155,7 +158,7 @@ class _ShellHeaderState extends State<_ShellHeader> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppNight.surfaceHigh,
+                  color: AppPalette.of(context).raised,
                   borderRadius: BorderRadius.circular(22),
                 ),
                 child: Row(
@@ -170,7 +173,7 @@ class _ShellHeaderState extends State<_ShellHeader> {
                       IconButton(
                         onPressed: () => context.go('/login'),
                         icon: const Icon(Icons.notifications_none_rounded),
-                        color: AppNight.muted,
+                        color: AppPalette.of(context).muted,
                         iconSize: 22,
                       ),
                     _ProfileChip(
@@ -227,7 +230,7 @@ class _NotificationBellState extends State<_NotificationBell> {
         children: [
           Icon(
             Icons.notifications_outlined,
-            color: AppNight.text,
+            color: AppPalette.of(context).text,
             size: 22,
           )
               .animate(key: ValueKey(_shakeTick))
@@ -251,7 +254,7 @@ class _NotificationBellState extends State<_NotificationBell> {
                 child: Text(
                   widget.unreadCount > 9 ? '9+' : '${widget.unreadCount}',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 8,
                     fontWeight: FontWeight.w700,
@@ -282,11 +285,11 @@ class _ProfileChip extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(2, 6, 8, 6),
         child: CircleAvatar(
           radius: 14,
-          backgroundColor: signedIn ? AppColors.primary : AppNight.surface,
+          backgroundColor: signedIn ? AppColors.primary : AppPalette.of(context).surface,
           child: Icon(
             Icons.person_rounded,
             size: 16,
-            color: signedIn ? Colors.white : AppNight.muted,
+            color: signedIn ? Colors.white : AppPalette.of(context).muted,
           ),
         ),
       ),
@@ -335,7 +338,7 @@ class _ShellBottomNav extends StatelessWidget {
     ];
 
     return Material(
-      color: AppNight.background,
+      color: AppPalette.of(context).background,
       child: SafeArea(
         top: false,
         child: Padding(
@@ -343,9 +346,9 @@ class _ShellBottomNav extends StatelessWidget {
           child: Container(
             height: 64,
             decoration: BoxDecoration(
-              color: AppNight.nav,
+              color: AppPalette.of(context).nav,
               borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: AppNight.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Row(
               children: destinations.asMap().entries.map((entry) {
@@ -366,7 +369,7 @@ class _ShellBottomNav extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? AppNight.surfaceHigh
+                              ? AppPalette.of(context).raised
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -378,7 +381,7 @@ class _ShellBottomNav extends StatelessWidget {
                               size: 20,
                               color: isActive
                                   ? AppColors.primaryLight
-                                  : AppNight.muted,
+                                  : AppPalette.of(context).muted,
                             ),
                             const SizedBox(height: 2),
                             Text(
@@ -390,7 +393,7 @@ class _ShellBottomNav extends StatelessWidget {
                                     : FontWeight.w500,
                                 color: isActive
                                     ? AppColors.primaryLight
-                                    : AppNight.muted,
+                                    : AppPalette.of(context).muted,
                               ),
                             ),
                           ],

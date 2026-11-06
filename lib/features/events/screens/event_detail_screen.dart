@@ -77,7 +77,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: AppNight.background,
+        backgroundColor: AppPalette.of(context).background,
         body: _loading
             ? _buildSkeleton()
             : _event == null
@@ -101,11 +101,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.error_outline, size: 48, color: AppNight.muted),
+          Icon(Icons.error_outline, size: 48, color: AppPalette.of(context).muted),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Failed to load event',
-            style: TextStyle(color: AppNight.muted),
+            style: TextStyle(color: AppPalette.of(context).muted),
           ),
           const SizedBox(height: 16),
           TextButton(onPressed: _load, child: const Text('Retry')),
@@ -137,10 +137,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         decoration: BoxDecoration(gradient: AppColors.heroGradient),
                       ),
                     ),
-                    const DecoratedBox(
+                    DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Color(0x330B1020), AppNight.background],
+                          colors: [Color(0x330B1020), AppPalette.of(context).background],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
@@ -164,8 +164,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         Container(
                           width: 36,
                           height: 36,
-                          decoration: const BoxDecoration(
-                            color: AppNight.surfaceHigh,
+                          decoration: BoxDecoration(
+                            color: AppPalette.of(context).raised,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -181,8 +181,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             children: [
                               Text(
                                 event.venue.isEmpty ? 'Venue to be announced' : event.venue,
-                                style: const TextStyle(
-                                  color: AppNight.text,
+                                style: TextStyle(
+                                  color: AppPalette.of(context).text,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -190,22 +190,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               if (event.totalCapacity != null)
                                 Text(
                                   'Capacity ${event.totalCapacity} verified attendees',
-                                  style: const TextStyle(
-                                    color: AppNight.muted,
+                                  style: TextStyle(
+                                    color: AppPalette.of(context).muted,
                                     fontSize: 12,
                                   ),
                                 ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded, color: AppNight.muted),
+                        Icon(Icons.chevron_right_rounded, color: AppPalette.of(context).muted),
                       ],
                     ),
                     const SizedBox(height: 16),
                     Text(
                       event.title,
-                      style: const TextStyle(
-                        color: AppNight.text,
+                      style: TextStyle(
+                        color: AppPalette.of(context).text,
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
                         height: 1.15,
@@ -215,7 +215,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const SizedBox(height: 6),
                     Text(
                       'From ${_naira(event.minPrice)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.primaryLight,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -224,14 +224,14 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const SizedBox(height: 4),
                     Text(
                       _when(event),
-                      style: const TextStyle(color: AppNight.muted, fontSize: 14),
+                      style: TextStyle(color: AppPalette.of(context).muted, fontSize: 14),
                     ),
                     if (event.ticketTiers.isNotEmpty) ...[
                       const SizedBox(height: 18),
-                      const Text(
+                      Text(
                         'Ticket Tier',
                         style: TextStyle(
-                          color: AppNight.muted,
+                          color: AppPalette.of(context).muted,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
@@ -264,21 +264,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       event.description.isEmpty
                           ? 'Details for this event will appear here.'
                           : event.description,
-                      style: const TextStyle(
-                        color: AppNight.text,
+                      style: TextStyle(
+                        color: AppPalette.of(context).text,
                         fontSize: 15,
                         height: 1.45,
                       ),
                     ),
                     const SizedBox(height: 14),
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.verified_user_outlined, color: AppColors.success, size: 16),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Instant digital pass delivery with QR gate admission',
-                            style: TextStyle(color: AppNight.muted, fontSize: 13),
+                            style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13),
                           ),
                         ),
                       ],
@@ -288,10 +288,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const SizedBox(height: 22),
                     GestureDetector(
                       onTap: () => context.go('/events'),
-                      child: const Text(
+                      child: Text(
                         'More live productions',
                         style: TextStyle(
-                          color: AppNight.text,
+                          color: AppPalette.of(context).text,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -311,17 +311,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
               decoration: BoxDecoration(
-                color: AppNight.surfaceHigh,
+                color: AppPalette.of(context).raised,
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: AppNight.border),
+                border: Border.all(color: AppPalette.of(context).border),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       selected?.name ?? 'Choose Tier',
-                      style: const TextStyle(
-                        color: AppNight.text,
+                      style: TextStyle(
+                        color: AppPalette.of(context).text,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -341,7 +341,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       selected == null
                           ? 'Select Tier · From ${_naira(event.minPrice)}'
                           : 'Buy Tickets · ${_naira(selected.price)}',
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                     ),
                   ),
                 ],
@@ -373,13 +373,13 @@ class _TierChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? Colors.white : AppNight.surfaceHigh,
+          color: selected ? Colors.white : AppPalette.of(context).raised,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           enabled ? label : '$label · Sold out',
           style: TextStyle(
-            color: selected ? const Color(0xFF121826) : AppNight.muted,
+            color: selected ? Color(0xFF121826) : AppPalette.of(context).muted,
             fontWeight: FontWeight.w700,
             fontSize: 13,
           ),
@@ -400,12 +400,12 @@ class _TierInfoCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppNight.card,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppNight.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: selected == null
-          ? const Column(
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
@@ -415,7 +415,7 @@ class _TierInfoCard extends StatelessWidget {
                     Text(
                       'Select Admission Tier',
                       style: TextStyle(
-                        color: AppNight.text,
+                        color: AppPalette.of(context).text,
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                       ),
@@ -425,7 +425,7 @@ class _TierInfoCard extends StatelessWidget {
                 SizedBox(height: 6),
                 Text(
                   'Choose a tier to view what is included and reserve admission.',
-                  style: TextStyle(color: AppNight.muted, fontSize: 13, height: 1.4),
+                  style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13, height: 1.4),
                 ),
               ],
             )
@@ -439,8 +439,8 @@ class _TierInfoCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         '${selected.name} Inclusions',
-                        style: const TextStyle(
-                          color: AppNight.text,
+                        style: TextStyle(
+                          color: AppPalette.of(context).text,
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                         ),
@@ -453,7 +453,7 @@ class _TierInfoCard extends StatelessWidget {
                   (selected.description != null && selected.description!.trim().isNotEmpty)
                       ? selected.description!
                       : 'Admission for ${selected.name}. Your pass is delivered in the app with a QR code for the gate.',
-                  style: const TextStyle(color: AppNight.muted, fontSize: 13, height: 1.4),
+                  style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13, height: 1.4),
                 ),
               ],
             ),

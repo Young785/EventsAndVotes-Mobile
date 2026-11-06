@@ -114,7 +114,7 @@ class _VotesListScreenState extends State<VotesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppNight.background,
+      backgroundColor: AppPalette.of(context).background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () => _load(),
@@ -287,9 +287,9 @@ class _VoteListCard extends StatelessWidget {
       onTap: () => context.push('/votes/${vote.slug}/${vote.voteId}'),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         clipBehavior: Clip.antiAlias,
         child: Row(
@@ -352,10 +352,10 @@ class _VoteListCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       vote.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
+                        color: AppPalette.of(context).text,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -387,9 +387,9 @@ class _VoteListCard extends StatelessWidget {
                           vote.endDate.length >= 10
                               ? vote.endDate.substring(0, 10)
                               : vote.endDate,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textHint,
+                            color: AppPalette.of(context).muted,
                           ),
                         ),
                       ],
@@ -415,9 +415,9 @@ class _VoteGridCard extends StatelessWidget {
       onTap: () => context.push('/votes/${vote.slug}/${vote.voteId}'),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -452,17 +452,18 @@ class _VoteGridCard extends StatelessWidget {
                       vote.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
+                        color: AppPalette.of(context).text,
                       ),
                     ),
                     const Spacer(),
                     Text(
                       '${vote.totalVotes} votes',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
-                        color: AppColors.textSecondary,
+                        color: AppPalette.of(context).muted,
                       ),
                     ),
                   ],
@@ -495,16 +496,16 @@ class _FilterChip extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? AppColors.primary : AppColors.white,
+          color: active ? AppColors.primary : AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(AppSpacing.chipRadius),
-          border: Border.all(color: active ? AppColors.primary : AppColors.border),
+          border: Border.all(color: active ? AppColors.primary : AppPalette.of(context).border),
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: active ? Colors.white : AppColors.textSecondary,
+            color: active ? Colors.white : AppPalette.of(context).muted,
           ),
         ),
       ),
@@ -522,11 +523,11 @@ class _InfoChip extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 11, color: AppColors.textSecondary),
+        Icon(icon, size: 11, color: AppPalette.of(context).muted),
         const SizedBox(width: 3),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+          style: TextStyle(fontSize: 11, color: AppPalette.of(context).muted),
         ),
       ],
     );

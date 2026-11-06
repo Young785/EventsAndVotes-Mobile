@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/theme_controller.dart';
 import '../../../core/services/profile_service.dart';
 import '../../../core/utils/json_parse_utils.dart';
 import '../../../features/auth/providers/auth_provider.dart';
@@ -74,15 +75,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppNight.surface,
+        backgroundColor: AppPalette.of(context).surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Sign Out',
-          style: TextStyle(fontWeight: FontWeight.w700, color: AppNight.text),
+          style: TextStyle(fontWeight: FontWeight.w700, color: AppPalette.of(context).text),
         ),
-        content: const Text(
+        content: Text(
           'Are you sure you want to sign out?',
-          style: TextStyle(color: AppNight.muted),
+          style: TextStyle(color: AppPalette.of(context).muted),
         ),
         actions: [
           TextButton(
@@ -165,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: AppNight.background,
+        backgroundColor: AppPalette.of(context).background,
         body: !auth.isAuthenticated
             ? _signedOut()
             : RefreshIndicator(
@@ -196,10 +197,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           const Icon(Icons.person_outline_rounded, color: AppColors.primaryLight, size: 42),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Sign in to view your profile',
             style: TextStyle(
-              color: AppNight.text,
+              color: AppPalette.of(context).text,
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -222,10 +223,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'Profile',
           style: TextStyle(
-            color: AppNight.text,
+            color: AppPalette.of(context).text,
             fontSize: 18,
             fontWeight: FontWeight.w700,
           ),
@@ -235,8 +236,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 12),
         Text(
           user?.fullName.trim().isNotEmpty == true ? user!.fullName : 'Member',
-          style: const TextStyle(
-            color: AppNight.text,
+          style: TextStyle(
+            color: AppPalette.of(context).text,
             fontSize: 22,
             fontWeight: FontWeight.w800,
           ),
@@ -244,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 4),
         Text(
           _subtitle(user),
-          style: const TextStyle(color: AppNight.muted, fontSize: 13),
+          style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13),
         ),
         const SizedBox(height: 14),
         GestureDetector(
@@ -253,9 +254,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             margin: const EdgeInsets.symmetric(horizontal: 24),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: AppNight.card,
+              color: AppPalette.of(context).card,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppNight.border),
+              border: Border.all(color: AppPalette.of(context).border),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -264,13 +265,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(width: 8),
                 Text(
                   'Wallet Balance: ₦${balance.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: AppNight.text,
+                  style: TextStyle(
+                    color: AppPalette.of(context).text,
                     fontWeight: FontWeight.w700,
                     fontSize: 13,
                   ),
                 ),
-                const Icon(Icons.chevron_right_rounded, color: AppNight.muted, size: 18),
+                Icon(Icons.chevron_right_rounded, color: AppPalette.of(context).muted, size: 18),
               ],
             ),
           ),
@@ -308,6 +309,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ]),
         const SizedBox(height: 12),
         _menuCard([
+          _MenuItem(
+            icon: Icons.brightness_6_outlined,
+            title: 'Appearance',
+            subtitle: context.watch<ThemeController>().isDark ? 'Dark mode' : 'Light mode',
+            trailing: Switch.adaptive(
+              value: context.watch<ThemeController>().isDark,
+              activeTrackColor: AppColors.primary,
+              onChanged: (value) => context.read<ThemeController>().setDark(value),
+            ),
+          ),
           _MenuItem(
             icon: Icons.notifications_none_rounded,
             title: 'Notifications',
@@ -367,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppNight.card,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.7)),
       ),
@@ -378,11 +389,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const Icon(Icons.payments_outlined, color: AppColors.primaryLight, size: 18),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Top Up Wallet',
                   style: TextStyle(
-                    color: AppNight.text,
+                    color: AppPalette.of(context).text,
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                   ),
@@ -393,14 +404,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _showTopUp = false;
                   _topUpAmount = null;
                 }),
-                icon: const Icon(Icons.close_rounded, color: AppNight.muted, size: 18),
+                icon: Icon(Icons.close_rounded, color: AppPalette.of(context).muted, size: 18),
               ),
             ],
           ),
-          const Text(
+          Text(
             'Add funds with Paystack to cast votes and buy event passes. '
             'Funding is not switched on for this account yet.',
-            style: TextStyle(color: AppNight.muted, fontSize: 13, height: 1.4),
+            style: TextStyle(color: AppPalette.of(context).muted, fontSize: 13, height: 1.4),
           ),
           const SizedBox(height: 12),
           Row(
@@ -415,13 +426,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       decoration: BoxDecoration(
                         color: _topUpAmount == amounts[i]
                             ? AppColors.primary
-                            : AppNight.surfaceHigh,
+                            : AppPalette.of(context).raised,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         '+ ₦${amounts[i].toStringAsFixed(0)}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
@@ -442,14 +453,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppNight.card,
+        color: AppPalette.of(context).card,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppNight.border),
+        border: Border.all(color: AppPalette.of(context).border),
       ),
       child: Column(
         children: [
           for (var i = 0; i < items.length; i++) ...[
-            if (i > 0) const Divider(height: 1, color: AppNight.border),
+            if (i > 0) Divider(height: 1, color: AppPalette.of(context).border),
             items[i],
           ],
         ],
@@ -484,8 +495,8 @@ class _MenuItem extends StatelessWidget {
             Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
-                color: AppNight.surfaceHigh,
+              decoration: BoxDecoration(
+                color: AppPalette.of(context).raised,
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 18, color: AppColors.primaryLight),
@@ -497,8 +508,8 @@ class _MenuItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: AppNight.text,
+                    style: TextStyle(
+                      color: AppPalette.of(context).text,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),
@@ -506,13 +517,13 @@ class _MenuItem extends StatelessWidget {
                   if (subtitle != null)
                     Text(
                       subtitle!,
-                      style: const TextStyle(color: AppNight.muted, fontSize: 12),
+                      style: TextStyle(color: AppPalette.of(context).muted, fontSize: 12),
                     ),
                 ],
               ),
             ),
             trailing ??
-                const Icon(Icons.chevron_right_rounded, color: AppNight.muted),
+                Icon(Icons.chevron_right_rounded, color: AppPalette.of(context).muted),
           ],
         ),
       ),
@@ -544,7 +555,7 @@ class _Avatar extends StatelessWidget {
       child: url == null
           ? Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
@@ -558,7 +569,7 @@ class _Avatar extends StatelessWidget {
                 fit: BoxFit.cover,
                 errorWidget: (_, __, ___) => Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.w800,

@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return Scaffold(
-      backgroundColor: AppNight.background,
+      backgroundColor: AppPalette.of(context).background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () => _loadData(silent: !_loading),
@@ -204,10 +204,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: AppNight.text,
+              color: AppPalette.of(context).text,
             ),
           ),
           const Spacer(),
@@ -233,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
         margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
         height: 176,
         decoration: BoxDecoration(
-          color: AppNight.surface,
+          color: AppPalette.of(context).surface,
           borderRadius: BorderRadius.circular(22),
         ),
         child: const Center(
@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 176,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
-          color: AppNight.surface,
+          color: AppPalette.of(context).surface,
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -315,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -377,9 +377,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   decoration: BoxDecoration(
-                    color: AppNight.card,
+                    color: AppPalette.of(context).card,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppNight.border),
+                    border: Border.all(color: AppPalette.of(context).border),
                   ),
                   child: Column(
                     children: [
@@ -387,8 +387,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 6),
                       Text(
                         items[i].label,
-                        style: const TextStyle(
-                          color: AppNight.text,
+                        style: TextStyle(
+                          color: AppPalette.of(context).text,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -473,7 +473,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Text(
               msg,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
               ),
@@ -496,9 +496,9 @@ class _VoteCard extends StatelessWidget {
       child: Container(
         width: 176,
         decoration: BoxDecoration(
-          color: AppNight.card,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppNight.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -512,7 +512,7 @@ class _VoteCard extends StatelessWidget {
                     imageUrl: vote.image ?? AppConstants.votePlaceholder,
                     fit: BoxFit.cover,
                     errorWidget: (_, __, ___) => Container(
-                      color: AppNight.surfaceHigh,
+                      color: AppPalette.of(context).raised,
                       child: const Icon(
                         Icons.how_to_vote_rounded,
                         color: AppColors.primaryLight,
@@ -542,7 +542,7 @@ class _VoteCard extends StatelessWidget {
                       vote.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -557,17 +557,17 @@ class _VoteCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.how_to_vote_outlined,
                     size: 13,
-                    color: AppNight.muted,
+                    color: AppPalette.of(context).muted,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '${vote.totalVotes} votes',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppNight.muted,
+                      color: AppPalette.of(context).muted,
                     ),
                   ),
                 ],
@@ -609,9 +609,9 @@ class _EventCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: AppNight.card,
+          color: AppPalette.of(context).card,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppNight.border),
+          border: Border.all(color: AppPalette.of(context).border),
         ),
         child: Row(
           children: [
@@ -624,7 +624,7 @@ class _EventCard extends StatelessWidget {
                   imageUrl: event.posterImage ?? AppConstants.eventPlaceholder,
                   fit: BoxFit.cover,
                   errorWidget: (_, __, ___) => Container(
-                    color: AppNight.surfaceHigh,
+                    color: AppPalette.of(context).raised,
                     child: const Icon(
                       Icons.bolt_rounded,
                       color: AppColors.primaryLight,
@@ -642,8 +642,8 @@ class _EventCard extends StatelessWidget {
                     event.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppNight.text,
+                    style: TextStyle(
+                      color: AppPalette.of(context).text,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
@@ -653,15 +653,15 @@ class _EventCard extends StatelessWidget {
                     _when(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: AppNight.muted,
+                    style: TextStyle(
+                      color: AppPalette.of(context).muted,
                       fontSize: 12,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'From ₦${event.minPrice.toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.primaryLight,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -670,7 +670,7 @@ class _EventCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: AppNight.muted),
+            Icon(Icons.chevron_right_rounded, color: AppPalette.of(context).muted),
           ],
         ),
       ),
