@@ -18,32 +18,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingSlide> _slides = [
     OnboardingSlide(
-      icon: Icons.how_to_vote_rounded,
-      title: 'Vote with Ease',
+      image: 'assets/images/onboarding_vote.jpg',
+      title: 'Vote with ease',
       description:
-          'Participate in elections and polls from anywhere, anytime. Your voice matters more than ever.',
-      color: AppColors.primary,
+          'Join contests and polls from your phone. Your choice is counted as soon as you send it.',
     ),
     OnboardingSlide(
-      icon: Icons.event_rounded,
-      title: 'Discover Events',
+      image: 'assets/images/hero_1.png',
+      title: 'Discover events',
       description:
-          'Find and attend exciting events in your area. From conferences to festivals, never miss out.',
-      color: AppColors.accent,
+          'Weddings, concerts, and community nights. Find what is on and keep your ticket on your phone.',
     ),
     OnboardingSlide(
-      icon: Icons.security_rounded,
-      title: 'Secure & Private',
+      image: 'assets/images/onboarding_events.jpg',
+      title: 'Show up ready',
       description:
-          'Your votes and personal information are protected with enterprise-grade security.',
-      color: AppColors.success,
+          'Buy a pass, open the QR at the gate, and walk in. No paper ticket to lose.',
     ),
     OnboardingSlide(
-      icon: Icons.trending_up_rounded,
-      title: 'Real-time Results',
+      image: 'assets/images/onboarding_secure.jpg',
+      title: 'Secure and private',
       description:
-          'Get instant updates on election results and event statistics as they happen.',
-      color: AppColors.info,
+          'Your votes and tickets stay on your account, protected from the moment you sign in.',
     ),
   ];
 
@@ -73,8 +69,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: palette.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -85,10 +83,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding: const EdgeInsets.all(16),
                 child: TextButton(
                   onPressed: _completeOnboarding,
-                  child: const Text(
+                  child: Text(
                     'Skip',
                     style: TextStyle(
-                      color: AppColors.textSecondary,
+                      color: palette.muted,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -113,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             // Page indicators
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
@@ -127,7 +125,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       color:
                           _currentPage == index
                               ? AppColors.primary
-                              : AppColors.border,
+                              : palette.border,
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -173,44 +171,39 @@ class _SlideContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = AppPalette.of(context);
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            'assets/images/onboarding_vote.png',
-            width: 220,
-            height: 220,
-            fit: BoxFit.contain,
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: Image.asset(
+                slide.image,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           const SizedBox(height: 28),
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: slide.color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(32),
-            ),
-            child: Icon(slide.icon, size: 56, color: slide.color),
-          ),
-          const SizedBox(height: 40),
           Text(
             slide.title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
+              color: palette.text,
+              letterSpacing: -0.4,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             slide.description,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: AppColors.textSecondary,
-              height: 1.6,
+              color: palette.muted,
+              height: 1.5,
             ),
             textAlign: TextAlign.center,
           ),
@@ -221,15 +214,13 @@ class _SlideContent extends StatelessWidget {
 }
 
 class OnboardingSlide {
-  final IconData icon;
+  final String image;
   final String title;
   final String description;
-  final Color color;
 
   OnboardingSlide({
-    required this.icon,
+    required this.image,
     required this.title,
     required this.description,
-    required this.color,
   });
 }

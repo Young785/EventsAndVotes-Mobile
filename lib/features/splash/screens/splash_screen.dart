@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/app_loader.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -13,8 +13,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -36,55 +35,76 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0D1B2A),
+        body: Stack(
+          fit: StackFit.expand,
           children: [
-            Container(
-              width: 120,
-              height: 120,
+            Image.asset(
+              'assets/images/login_hero.jpg',
+              fit: BoxFit.cover,
+            ),
+            const DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x661A3A6B),
+                    Color(0xCC0D1B2A),
+                    Color(0xF01A6BFF),
+                  ],
+                  stops: [0, 0.45, 1],
+                ),
               ),
-              child: const Icon(
-                Icons.how_to_vote_rounded,
-                size: 60,
-                color: AppColors.primary,
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(32, 24, 32, 36),
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: Image.asset(
+                        'assets/images/app_icon.png',
+                        width: 96,
+                        height: 96,
+                        fit: BoxFit.cover,
+                      ),
+                    ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+                    const SizedBox(height: 28),
+                    const Text(
+                      'Events & Votes',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.6,
+                      ),
+                    ).animate().fadeIn(delay: 150.ms, duration: 500.ms),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Tickets, contests, and nights out',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white70,
+                      ),
+                    ).animate().fadeIn(delay: 250.ms, duration: 500.ms),
+                    const Spacer(),
+                    const AppLoader(
+                      color: Colors.white,
+                      trackColor: Color(0x55FFFFFF),
+                    ).animate().fadeIn(delay: 400.ms, duration: 500.ms),
+                  ],
+                ),
               ),
-            ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
-            const SizedBox(height: 24),
-            const Text(
-              'Events & Votes',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ).animate().fadeIn(delay: 200.ms, duration: 600.ms),
-            const SizedBox(height: 8),
-            const Text(
-              'Your voice matters',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.white70,
-              ),
-            ).animate().fadeIn(delay: 300.ms, duration: 600.ms),
-            const SizedBox(height: 48),
-            const AppLoader(
-              color: Colors.white,
-              trackColor: Color(0x55FFFFFF),
-            ).animate().fadeIn(delay: 400.ms, duration: 600.ms),
+            ),
           ],
         ),
       ),
