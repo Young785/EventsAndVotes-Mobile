@@ -70,6 +70,20 @@ bool _requiresUserAuth(String loc) =>
     loc.startsWith('/my-tickets') ||
     _isVerificationRoute(loc);
 
+Map<int, int> _ticketQuantities(Map<String, String> query) {
+  final quantities = <int, int>{};
+  for (final part in (query['qty'] ?? '').split(',')) {
+    final bits = part.split(':');
+    if (bits.length != 2) continue;
+    final id = int.tryParse(bits[0]);
+    final qty = int.tryParse(bits[1]);
+    if (id != null && qty != null && qty > 0) quantities[id] = qty;
+  }
+  final tier = int.tryParse(query['tier'] ?? '');
+  if (tier != null) quantities.putIfAbsent(tier, () => 1);
+  return quantities;
+}
+
 String _authenticatedHome(AuthProvider auth) {
   if (auth.needsVerification) return '/verification';
   return '/';
@@ -279,7 +293,7 @@ GoRouter createRouter(
         builder: (c, s) =>
             BuyTicketsScreen(
               eventId: s.pathParameters['id']!,
-              initialTierId: int.tryParse(s.uri.queryParameters['tier'] ?? ''),
+              initialQuantities: _ticketQuantities(s.uri.queryParameters),
             ),
       ),
       GoRoute(

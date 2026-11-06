@@ -15,11 +15,11 @@ import '../../../shared/widgets/app_alert.dart';
 
 class BuyTicketsScreen extends StatefulWidget {
   final String eventId;
-  final int? initialTierId;
+  final Map<int, int> initialQuantities;
   const BuyTicketsScreen({
     super.key,
     required this.eventId,
-    this.initialTierId,
+    this.initialQuantities = const {},
   });
 
   @override
@@ -69,9 +69,10 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
           for (final tier in _event!.ticketTiers.where((t) => t.isActive)) {
             _quantities[tier.id] = 0;
           }
-          final selected = widget.initialTierId;
-          if (selected != null && _quantities.containsKey(selected)) {
-            _quantities[selected] = 1;
+          for (final entry in widget.initialQuantities.entries) {
+            if (_quantities.containsKey(entry.key)) {
+              _quantities[entry.key] = entry.value;
+            }
           }
         });
       }

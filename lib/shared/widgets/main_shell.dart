@@ -411,12 +411,15 @@ class _ShellBottomNav extends StatelessWidget {
     ];
 
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final glass = dark
-        ? const Color(0xFF1A2236).withValues(alpha: 0.62)
-        : Colors.white.withValues(alpha: 0.62);
+    final glassTop = dark
+        ? Colors.white.withValues(alpha: 0.16)
+        : Colors.white.withValues(alpha: 0.72);
+    final glassBottom = dark
+        ? Colors.white.withValues(alpha: 0.06)
+        : Colors.white.withValues(alpha: 0.38);
     final line = dark
-        ? Colors.white.withValues(alpha: 0.14)
-        : Colors.white.withValues(alpha: 0.8);
+        ? Colors.white.withValues(alpha: 0.22)
+        : Colors.white.withValues(alpha: 0.9);
 
     final homeInset = MediaQuery.paddingOf(context).bottom;
     final bottomGap = homeInset > 20 ? homeInset - 22 : (homeInset > 0 ? homeInset : 8.0);
@@ -425,14 +428,29 @@ class _ShellBottomNav extends StatelessWidget {
       type: MaterialType.transparency,
       child: Padding(
           padding: EdgeInsets.fromLTRB(18, 0, 18, bottomGap),
-          child: ClipRRect(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: dark ? 0.28 : 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: ClipRRect(
             borderRadius: BorderRadius.circular(32),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
               child: Container(
                 height: 64,
                 decoration: BoxDecoration(
-                  color: glass,
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [glassTop, glassBottom],
+                  ),
                   borderRadius: BorderRadius.circular(32),
                   border: Border.all(color: line),
                 ),
@@ -455,9 +473,16 @@ class _ShellBottomNav extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isActive
-                              ? AppColors.primary.withValues(alpha: 0.12)
+                              ? (dark
+                                  ? Colors.white.withValues(alpha: 0.16)
+                                  : Colors.white.withValues(alpha: 0.72))
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(18),
+                          border: isActive
+                              ? Border.all(
+                                  color: Colors.white.withValues(alpha: dark ? 0.2 : 0.9),
+                                )
+                              : null,
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -493,6 +518,7 @@ class _ShellBottomNav extends StatelessWidget {
               ),
             ),
           ),
+        ),
         ),
     );
   }

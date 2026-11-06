@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +26,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   final EventsService _eventsService = EventsService();
   EventModel? _event;
   bool _loading = true;
-  int? _selectedTierId;
+  int? _focusTierId;
+  final Map<int, int> _quantities = {};
 
   @override
   void initState() {
@@ -37,9 +39,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     try {
       final data = await _eventsService.getEventDetails(widget.eventId);
       if (mounted) {
+        final event = EventModel.fromJson(data);
         setState(() {
-          _event = EventModel.fromJson(data);
+          _event = event;
           _loading = false;
+          for (final tier in event.ticketTiers) {
+            _quantities.putIfAbsent(tier.id, () => 0);
+          }
         });
       }
       return;
@@ -53,26 +59,64 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
-  TicketTierModel? get _selected {
+  TicketTierModel? _tierById(int? id) {
     final event = _event;
-    if (event == null || _selectedTierId == null) return null;
+    if (event == null || id == null) return null;
     for (final tier in event.ticketTiers) {
-      if (tier.id == _selectedTierId) return tier;
+      if (tier.id == id) return tier;
     }
     return null;
   }
 
-  void _buy() {
+  TicketTierModel? get _selected {
+    final focused = _tierById(_focusTierId);
+    if (focused != null && (_quantities[focused.id] ?? 0) > 0) return focused;
     final event = _event;
-    final tier = _selected;
-    if (event == null) return;
-    if (tier == null || !tier.isActive) {
+    if (event == null) return null;
+    for (final tier in event.ticketTiers) {
+      if ((_quantities[tier.id] ?? 0) > 0) return tier;
+    }
+    return null;
+  }
+
+  int get _totalQty => _quantities.values.fold(0, (sum, qty) => sum + qty);
+
+  double get _total {
+    final event = _event;
+    if (event == null) return 0;
+    var sum = 0.0;
+    for (final tier in event.ticketTiers) {
+      sum += tier.price * (_quantities[tier.id] ?? 0);
+    }
+    return sum;
+  }
+
+  int _remaining(TicketTierModel tier) {
+    if (tier.capacity == null) return 20;
+    final left = tier.capacity! - tier.soldCount;
+    return left < 0 ? 0 : left;
+  }
+
+  void _setQty(TicketTierModel tier, int next) {
+    if (!tier.isActive) return;
+    final cap = _remaining(tier);
+    final qty = next.clamp(0, cap);
+    setState(() {
+      _quantities[tier.id] = qty;
+      _focusTierId = tier.id;
+    });
+  }
+
+  void _buy() {
+    final picked = _quantities.entries.where((entry) => entry.value > 0).toList();
+    if (picked.isEmpty) {
       showTopAlert(context, 
-        const SnackBar(content: Text('Choose a ticket tier to continue')),
+        const SnackBar(content: Text('Add at least one ticket to continue')),
       );
       return;
     }
-    context.push('/events/${widget.eventId}/tickets?tier=${tier.id}');
+    final qty = picked.map((entry) => '${entry.key}:${entry.value}').join(',');
+    context.push('/events/${widget.eventId}/tickets?qty=$qty');
   }
 
   Future<void> _openVenueMap(String venue) async {
@@ -276,28 +320,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            for (final tier in event.ticketTiers) ...[
-                              _TierChip(
-                                label: '${tier.name} (${_naira(tier.price)})',
-                                selected: tier.id == _selectedTierId,
-                                enabled: tier.isActive,
-                                onTap: tier.isActive
-                                    ? () => setState(() {
-                                          _selectedTierId =
-                                              _selectedTierId == tier.id ? null : tier.id;
-                                        })
-                                    : null,
-                              ),
-                              const SizedBox(width: 8),
-                            ],
-                          ],
+                      const SizedBox(height: 10),
+                      for (final tier in event.ticketTiers) ...[
+                        _TierQuantityRow(
+                          tier: tier,
+                          quantity: _quantities[tier.id] ?? 0,
+                          remaining: _remaining(tier),
+                          priceLabel: _naira(tier.price),
+                          onChanged: (next) => _setQty(tier, next),
                         ),
-                      ),
+                        const SizedBox(height: 10),
+                      ],
                     ],
                     const SizedBox(height: 16),
                     Text(
@@ -347,44 +380,60 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           Positioned(
             left: 16,
             right: 16,
-            bottom: 16,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
-              decoration: BoxDecoration(
-                color: AppPalette.of(context).raised,
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: AppPalette.of(context).border),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      selected?.name ?? 'Choose Tier',
-                      style: TextStyle(
-                        color: AppPalette.of(context).text,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
+            bottom: 12 + MediaQuery.paddingOf(context).bottom,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white.withValues(alpha: 0.12)
+                        : Colors.white.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withValues(
+                        alpha: Theme.of(context).brightness == Brightness.dark ? 0.2 : 0.85,
                       ),
                     ),
                   ),
-                  FilledButton(
-                    onPressed: _buy,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _totalQty == 0
+                              ? 'Choose tickets'
+                              : _totalQty == 1
+                                  ? (selected?.name ?? '1 ticket')
+                                  : '$_totalQty tickets',
+                          style: TextStyle(
+                            color: AppPalette.of(context).text,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      selected == null
-                          ? 'Select Tier · From ${_naira(event.minPrice)}'
-                          : 'Buy Tickets · ${_naira(selected.price)}',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                    ),
+                      FilledButton(
+                        onPressed: _buy,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: Text(
+                          _totalQty == 0
+                              ? 'Buy Tickets'
+                              : 'Buy · ${_naira(_total)}',
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -393,35 +442,116 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 }
 
-class _TierChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final bool enabled;
-  final VoidCallback? onTap;
+class _TierQuantityRow extends StatelessWidget {
+  final TicketTierModel tier;
+  final int quantity;
+  final int remaining;
+  final String priceLabel;
+  final ValueChanged<int> onChanged;
 
-  const _TierChip({
-    required this.label,
-    required this.selected,
-    required this.enabled,
-    this.onTap,
+  const _TierQuantityRow({
+    required this.tier,
+    required this.quantity,
+    required this.remaining,
+    required this.priceLabel,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected ? Colors.white : AppPalette.of(context).raised,
-          borderRadius: BorderRadius.circular(20),
+    final palette = AppPalette.of(context);
+    final soldOut = !tier.isActive || remaining == 0;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      decoration: BoxDecoration(
+        color: palette.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: quantity > 0 ? AppColors.primary : palette.border,
         ),
-        child: Text(
-          enabled ? label : '$label · Sold out',
-          style: TextStyle(
-            color: selected ? Color(0xFF121826) : AppPalette.of(context).muted,
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tier.name,
+                  style: TextStyle(
+                    color: palette.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  soldOut ? 'Sold out' : priceLabel,
+                  style: TextStyle(
+                    color: soldOut ? palette.muted : AppColors.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _StepButton(
+            icon: Icons.remove_rounded,
+            enabled: !soldOut && quantity > 0,
+            onTap: () => onChanged(quantity - 1),
+          ),
+          SizedBox(
+            width: 28,
+            child: Text(
+              '$quantity',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: palette.text,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          _StepButton(
+            icon: Icons.add_rounded,
+            enabled: !soldOut && quantity < remaining,
+            onTap: () => onChanged(quantity + 1),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _StepButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: enabled
+          ? AppColors.primary.withValues(alpha: 0.12)
+          : AppPalette.of(context).surface,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: enabled ? onTap : null,
+        child: SizedBox(
+          width: 34,
+          height: 34,
+          child: Icon(
+            icon,
+            size: 18,
+            color: enabled ? AppColors.primary : AppPalette.of(context).muted,
           ),
         ),
       ),
