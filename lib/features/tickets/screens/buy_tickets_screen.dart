@@ -13,7 +13,12 @@ import '../../../shared/widgets/detail_back_button.dart';
 
 class BuyTicketsScreen extends StatefulWidget {
   final String eventId;
-  const BuyTicketsScreen({super.key, required this.eventId});
+  final int? initialTierId;
+  const BuyTicketsScreen({
+    super.key,
+    required this.eventId,
+    this.initialTierId,
+  });
 
   @override
   State<BuyTicketsScreen> createState() => _BuyTicketsScreenState();
@@ -61,6 +66,10 @@ class _BuyTicketsScreenState extends State<BuyTicketsScreen> {
           }
           for (final tier in _event!.ticketTiers.where((t) => t.isActive)) {
             _quantities[tier.id] = 0;
+          }
+          final selected = widget.initialTierId;
+          if (selected != null && _quantities.containsKey(selected)) {
+            _quantities[selected] = 1;
           }
         });
       }

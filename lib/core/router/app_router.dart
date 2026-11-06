@@ -277,7 +277,10 @@ GoRouter createRouter(
         path: '/events/:id/tickets',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (c, s) =>
-            BuyTicketsScreen(eventId: s.pathParameters['id']!),
+            BuyTicketsScreen(
+              eventId: s.pathParameters['id']!,
+              initialTierId: int.tryParse(s.uri.queryParameters['tier'] ?? ''),
+            ),
       ),
       GoRoute(
         path: '/change-password',

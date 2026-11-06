@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -20,11 +21,13 @@ class MainShell extends StatelessWidget {
   }
 
   int _tabIndex(String location, AuthProvider auth) {
-    if (location.startsWith('/my-tickets')) return 3;
     if (location.startsWith('/votes')) return 1;
     if (location.startsWith('/events')) return 2;
-    if (location.startsWith('/dashboard')) return 4;
-    if (location.startsWith('/profile')) return 5;
+    if (location.startsWith('/profile') ||
+        location.startsWith('/my-tickets') ||
+        location.startsWith('/dashboard')) {
+      return 3;
+    }
     return 0;
   }
 
@@ -46,21 +49,27 @@ class MainShell extends StatelessWidget {
     final index = _tabIndex(location, auth);
 
     if (isDetail) {
-      return Scaffold(backgroundColor: AppColors.background, body: child);
+      return Scaffold(backgroundColor: AppNight.background, body: child);
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _ShellHeader(auth: auth, title: _headerTitle(location)),
-          Expanded(child: child),
-        ],
-      ),
-      bottomNavigationBar: _ShellBottomNav(
-        currentIndex: index,
-        auth: auth,
+    final hideHeader = location == '/profile';
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: AppNight.background,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (!hideHeader)
+              _ShellHeader(auth: auth, title: _headerTitle(location)),
+            Expanded(child: child),
+          ],
+        ),
+        bottomNavigationBar: _ShellBottomNav(
+          currentIndex: index,
+          auth: auth,
+        ),
       ),
     );
   }
@@ -108,79 +117,71 @@ class _ShellHeaderState extends State<_ShellHeader> {
   Widget build(BuildContext context) {
     final auth = widget.auth;
     return Material(
-      color: AppColors.white,
+      color: AppNight.background,
       child: SafeArea(
         bottom: false,
         child: Container(
           height: 56,
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: AppColors.border)),
-          ),
           child: Row(
             children: [
               Container(
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  color: AppColors.primary,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
-                  Icons.how_to_vote_rounded,
+                  Icons.bolt_rounded,
                   color: Colors.white,
-                  size: 18,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   widget.title,
-                  style: AppTextStyles.headlineSmall,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: AppNight.text,
+                    letterSpacing: -0.2,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (auth.user?.isAdmin == true)
-                IconButton(
-                  icon: const Icon(Icons.admin_panel_settings_outlined,
-                      size: 22),
-                  color: AppColors.primary,
-                  onPressed: () => context.push('/admin/dashboard'),
-                  tooltip: 'Vendor portal',
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppNight.surfaceHigh,
+                  borderRadius: BorderRadius.circular(22),
                 ),
-              if (auth.isAuthenticated) ...[
-                _NotificationBell(
-                  unreadCount: _unreadCount,
-                  onTap: _openNotifications,
-                ),
-                const SizedBox(width: 4),
-                _ProfileChip(
-                  name: auth.user?.firstName ?? 'User',
-                  onTap: () => context.go('/profile'),
-                ),
-              ] else
-                TextButton(
-                  onPressed: () => context.go('/login'),
-                  style: TextButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (auth.isAuthenticated)
+                      _NotificationBell(
+                        unreadCount: _unreadCount,
+                        onTap: _openNotifications,
+                      )
+                    else
+                      IconButton(
+                        onPressed: () => context.go('/login'),
+                        icon: const Icon(Icons.notifications_none_rounded),
+                        color: AppNight.muted,
+                        iconSize: 22,
+                      ),
+                    _ProfileChip(
+                      signedIn: auth.isAuthenticated,
+                      onTap: () => context.go(
+                        auth.isAuthenticated ? '/profile' : '/login',
+                      ),
                     ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style:
-                        TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
@@ -226,8 +227,8 @@ class _NotificationBellState extends State<_NotificationBell> {
         children: [
           Icon(
             Icons.notifications_outlined,
-            color: AppColors.textPrimary,
-            size: 24,
+            color: AppNight.text,
+            size: 22,
           )
               .animate(key: ValueKey(_shakeTick))
               .shake(
@@ -265,39 +266,28 @@ class _NotificationBellState extends State<_NotificationBell> {
 }
 
 class _ProfileChip extends StatelessWidget {
-  final String name;
+  final bool signedIn;
   final VoidCallback onTap;
 
-  const _ProfileChip({required this.name, required this.onTap});
+  const _ProfileChip({
+    required this.signedIn,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.primarySurface,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 12,
-              backgroundColor: AppColors.primary,
-              child: Text(
-                name.isNotEmpty ? name[0].toUpperCase() : 'U',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(name, style: AppTextStyles.labelLarge),
-          ],
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(2, 6, 8, 6),
+        child: CircleAvatar(
+          radius: 14,
+          backgroundColor: signedIn ? AppColors.primary : AppNight.surface,
+          child: Icon(
+            Icons.person_rounded,
+            size: 16,
+            color: signedIn ? Colors.white : AppNight.muted,
+          ),
         ),
       ),
     );
@@ -325,36 +315,16 @@ class _ShellBottomNav extends StatelessWidget {
         route: '/',
       ),
       (
-        icon: Icons.how_to_vote_outlined,
-        activeIcon: Icons.how_to_vote_rounded,
+        icon: Icons.track_changes_outlined,
+        activeIcon: Icons.track_changes_rounded,
         label: 'Votes',
         route: '/votes',
       ),
       (
-        icon: Icons.event_outlined,
-        activeIcon: Icons.event_rounded,
+        icon: Icons.calendar_today_outlined,
+        activeIcon: Icons.calendar_today_rounded,
         label: 'Events',
         route: '/events',
-      ),
-      if (auth.isAuthenticated)
-        (
-          icon: Icons.confirmation_number_outlined,
-          activeIcon: Icons.confirmation_number_rounded,
-          label: 'Tickets',
-          route: '/my-tickets',
-        )
-      else
-        (
-          icon: Icons.login_rounded,
-          activeIcon: Icons.login_rounded,
-          label: 'Sign In',
-          route: '/login',
-        ),
-      (
-        icon: Icons.card_giftcard_outlined,
-        activeIcon: Icons.card_giftcard_rounded,
-        label: 'Reward',
-        route: auth.isAuthenticated ? '/dashboard' : '/login',
       ),
       (
         icon: Icons.person_outline_rounded,
@@ -365,54 +335,72 @@ class _ShellBottomNav extends StatelessWidget {
     ];
 
     return Material(
-      color: AppColors.white,
+      color: AppNight.background,
       child: SafeArea(
         top: false,
-        child: Container(
-          height: 64,
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(color: AppColors.border)),
-          ),
-          child: Row(
-            children: destinations.asMap().entries.map((entry) {
-              final i = entry.key;
-              final d = entry.value;
-              final isActive = currentIndex >= 0 && i == currentIndex;
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: AppNight.nav,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: AppNight.border),
+            ),
+            child: Row(
+              children: destinations.asMap().entries.map((entry) {
+                final i = entry.key;
+                final d = entry.value;
+                final isActive = currentIndex >= 0 && i == currentIndex;
 
-              return Expanded(
-                child: InkWell(
-                  onTap: () => context.go(d.route),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          isActive ? d.activeIcon : d.icon,
-                          size: 22,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => context.go(d.route),
+                    behavior: HitTestBehavior.opaque,
+                    child: Center(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
                           color: isActive
-                              ? AppColors.primary
-                              : AppColors.textHint,
+                              ? AppNight.surfaceHigh
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(18),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          d.label,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight:
-                                isActive ? FontWeight.w600 : FontWeight.w400,
-                            color: isActive
-                                ? AppColors.primary
-                                : AppColors.textHint,
-                          ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isActive ? d.activeIcon : d.icon,
+                              size: 20,
+                              color: isActive
+                                  ? AppColors.primaryLight
+                                  : AppNight.muted,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              d.label,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: isActive
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: isActive
+                                    ? AppColors.primaryLight
+                                    : AppNight.muted,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           ),
         ),
       ),

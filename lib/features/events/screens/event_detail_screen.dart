@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/app_theme.dart';
@@ -22,6 +22,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   final EventsService _eventsService = EventsService();
   EventModel? _event;
   bool _loading = true;
+  int? _selectedTierId;
 
   @override
   void initState() {
@@ -49,40 +50,48 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  TicketTierModel? get _selected {
+    final event = _event;
+    if (event == null || _selectedTierId == null) return null;
+    for (final tier in event.ticketTiers) {
+      if (tier.id == _selectedTierId) return tier;
+    }
+    return null;
+  }
+
+  void _buy() {
+    final event = _event;
+    final tier = _selected;
+    if (event == null) return;
+    if (tier == null || !tier.isActive) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choose a ticket tier to continue')),
+      );
+      return;
+    }
+    context.push('/events/${widget.eventId}/tickets?tier=${tier.id}');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body:
-          _loading
-              ? _buildSkeleton()
-              : _event == null
-              ? _buildError()
-              : _buildContent(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: AppNight.background,
+        body: _loading
+            ? _buildSkeleton()
+            : _event == null
+                ? _buildError()
+                : _buildContent(),
+      ),
     );
   }
 
   Widget _buildSkeleton() {
-    return Stack(
+    return const Stack(
       children: [
-        CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Stack(
-                children: [
-                  const ShimmerCard(height: 240, radius: 0),
-                  const Positioned(top: 0, left: 0, child: DetailBackButton()),
-                ],
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: ShimmerList(count: 4, itemHeight: 80),
-              ),
-            ),
-          ],
-        ),
+        ShimmerCard(height: 280, radius: 0),
+        Positioned(top: 0, left: 0, child: DetailBackButton()),
       ],
     );
   }
@@ -92,13 +101,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            size: 48,
-            color: AppColors.textHint,
-          ),
+          const Icon(Icons.error_outline, size: 48, color: AppNight.muted),
           const SizedBox(height: 12),
-          const Text('Failed to load event', style: AppTextStyles.bodyMedium),
+          const Text(
+            'Failed to load event',
+            style: TextStyle(color: AppNight.muted),
+          ),
           const SizedBox(height: 16),
           TextButton(onPressed: _load, child: const Text('Retry')),
         ],
@@ -108,394 +116,366 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Widget _buildContent() {
     final event = _event!;
+    final selected = _selected;
+    final activeTiers = event.ticketTiers.where((t) => t.isActive).toList();
+
     return Stack(
       children: [
         CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: Stack(
-                children: [
-                  CachedNetworkImage(
-                    imageUrl:
-                        event.posterImage ?? AppConstants.eventPlaceholder,
-                    fit: BoxFit.cover,
-                    height: 240,
-                    errorWidget:
-                        (_, __, ___) => Container(
-                          height: 240,
-                          decoration: const BoxDecoration(
-                            gradient: AppColors.heroGradient,
-                          ),
-                        ),
-                  ),
-                  Container(
-                    height: 240,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.75),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
+              child: SizedBox(
+                height: 220,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: event.posterImage ?? AppConstants.eventPlaceholder,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => const DecoratedBox(
+                        decoration: BoxDecoration(gradient: AppColors.heroGradient),
                       ),
                     ),
-                  ),
-                  const Positioned(top: 0, left: 0, child: DetailBackButton()),
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        StatusBadge(status: event.status),
-                        const SizedBox(height: 6),
-                        Text(
-                          event.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            shadows: [
-                              Shadow(blurRadius: 8, color: Colors.black54),
-                            ],
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0x330B1020), AppNight.background],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ],
+                    const Positioned(top: 0, left: 0, child: DetailBackButton()),
+                  ],
+                ),
               ),
             ),
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Key info row
+                    StatusBadge(status: event.status),
+                    const SizedBox(height: 14),
                     Row(
                       children: [
-                        _InfoTile(
-                          icon: Icons.location_on_outlined,
-                          label: 'Venue',
-                          value: event.venue,
-                          color: AppColors.error,
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: const BoxDecoration(
+                            color: AppNight.surfaceHigh,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.location_on_outlined,
+                            color: AppColors.primaryLight,
+                            size: 18,
+                          ),
                         ),
                         const SizedBox(width: 10),
-                        _InfoTile(
-                          icon: Icons.calendar_today_outlined,
-                          label: 'Date',
-                          value:
-                              event.startDate.length >= 10
-                                  ? event.startDate.substring(0, 10)
-                                  : event.startDate,
-                          color: AppColors.primary,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                event.venue.isEmpty ? 'Venue to be announced' : event.venue,
+                                style: const TextStyle(
+                                  color: AppNight.text,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              if (event.totalCapacity != null)
+                                Text(
+                                  'Capacity ${event.totalCapacity} verified attendees',
+                                  style: const TextStyle(
+                                    color: AppNight.muted,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
+                        const Icon(Icons.chevron_right_rounded, color: AppNight.muted),
                       ],
-                    ).animate().fadeIn(duration: 300.ms),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        if (event.startTime != null)
-                          Expanded(
-                            child: _InfoTile(
-                              icon: Icons.access_time_rounded,
-                              label: 'Time',
-                              value:
-                                  '${event.startTime} - ${event.endTime ?? ''}',
-                              color: AppColors.accent,
-                            ),
-                          ),
-                        if (event.totalCapacity != null) ...[
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: _InfoTile(
-                              icon: Icons.people_outline_rounded,
-                              label: 'Capacity',
-                              value: '${event.totalCapacity} seats',
-                              color: AppColors.success,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ).animate().fadeIn(delay: 60.ms, duration: 300.ms),
-                    const SizedBox(height: 20),
-
-                    // Description
-                    const Text(
-                      'About this Event',
-                      style: AppTextStyles.headlineSmall,
-                    ).animate().fadeIn(delay: 100.ms),
-                    const SizedBox(height: 8),
+                    ),
+                    const SizedBox(height: 16),
                     Text(
-                      event.description,
+                      event.title,
                       style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                        height: 1.6,
+                        color: AppNight.text,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        height: 1.15,
+                        letterSpacing: -0.4,
                       ),
-                    ).animate().fadeIn(delay: 120.ms, duration: 300.ms),
-                    const SizedBox(height: 24),
-
-                    // Ticket Tiers
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'From ${_naira(event.minPrice)}',
+                      style: const TextStyle(
+                        color: AppColors.primaryLight,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _when(event),
+                      style: const TextStyle(color: AppNight.muted, fontSize: 14),
+                    ),
                     if (event.ticketTiers.isNotEmpty) ...[
+                      const SizedBox(height: 18),
                       const Text(
-                        'Ticket Tiers',
-                        style: AppTextStyles.headlineSmall,
-                      ).animate().fadeIn(delay: 140.ms),
-                      const SizedBox(height: 12),
-                      ...event.ticketTiers.asMap().entries.map(
-                        (e) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _TicketTierCard(
-                            tier: e.value,
-                            eventId: widget.eventId,
-                          )
-                              .animate()
-                              .fadeIn(
-                                delay: (160 + e.key * 50).ms,
-                                duration: 300.ms,
-                              )
-                              .slideY(begin: 0.04, end: 0),
+                        'Ticket Tier',
+                        style: TextStyle(
+                          color: AppNight.muted,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            for (final tier in event.ticketTiers) ...[
+                              _TierChip(
+                                label: '${tier.name} (${_naira(tier.price)})',
+                                selected: tier.id == _selectedTierId,
+                                enabled: tier.isActive,
+                                onTap: tier.isActive
+                                    ? () => setState(() {
+                                          _selectedTierId =
+                                              _selectedTierId == tier.id ? null : tier.id;
+                                        })
+                                    : null,
+                              ),
+                              const SizedBox(width: 8),
+                            ],
+                          ],
                         ),
                       ),
                     ],
-                    const SizedBox(height: 100),
+                    const SizedBox(height: 16),
+                    Text(
+                      event.description.isEmpty
+                          ? 'Details for this event will appear here.'
+                          : event.description,
+                      style: const TextStyle(
+                        color: AppNight.text,
+                        fontSize: 15,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Row(
+                      children: [
+                        Icon(Icons.verified_user_outlined, color: AppColors.success, size: 16),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Instant digital pass delivery with QR gate admission',
+                            style: TextStyle(color: AppNight.muted, fontSize: 13),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _TierInfoCard(tier: selected),
+                    const SizedBox(height: 22),
+                    GestureDetector(
+                      onTap: () => context.go('/events'),
+                      child: const Text(
+                        'More live productions',
+                        style: TextStyle(
+                          color: AppNight.text,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ],
         ),
-        if (event.ticketTiers.any((t) => t.isActive))
+        if (activeTiers.isNotEmpty)
           Positioned(
             left: 16,
             right: 16,
-            bottom: 24,
-            child: ElevatedButton(
-              onPressed: () =>
-                  context.push('/events/${widget.eventId}/tickets'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+            bottom: 16,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+              decoration: BoxDecoration(
+                color: AppNight.surfaceHigh,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppNight.border),
               ),
-              child: const Text(
-                'Buy Tickets',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      selected?.name ?? 'Choose Tier',
+                      style: const TextStyle(
+                        color: AppNight.text,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  FilledButton(
+                    onPressed: _buy,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      selected == null
+                          ? 'Select Tier · From ${_naira(event.minPrice)}'
+                          : 'Buy Tickets · ${_naira(selected.price)}',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
       ],
     );
   }
-
 }
 
-class _InfoTile extends StatelessWidget {
-  final IconData icon;
+class _TierChip extends StatelessWidget {
   final String label;
-  final String value;
-  final Color color;
-  const _InfoTile({
-    required this.icon,
+  final bool selected;
+  final bool enabled;
+  final VoidCallback? onTap;
+
+  const _TierChip({
     required this.label,
-    required this.value,
-    required this.color,
+    required this.selected,
+    required this.enabled,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    return GestureDetector(
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.border),
+          color: selected ? Colors.white : AppNight.surfaceHigh,
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: color, size: 16),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        child: Text(
+          enabled ? label : '$label · Sold out',
+          style: TextStyle(
+            color: selected ? const Color(0xFF121826) : AppNight.muted,
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+          ),
         ),
       ),
     );
   }
 }
 
-class _TicketTierCard extends StatelessWidget {
-  final TicketTierModel tier;
-  final String eventId;
-  const _TicketTierCard({required this.tier, required this.eventId});
+class _TierInfoCard extends StatelessWidget {
+  final TicketTierModel? tier;
+  const _TierInfoCard({required this.tier});
 
   @override
   Widget build(BuildContext context) {
-    final isFree = tier.price == 0;
+    final selected = tier;
     return Container(
-      padding: const EdgeInsets.all(14),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        color: AppNight.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppNight.border),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              gradient:
-                  isFree
-                      ? const LinearGradient(
-                        colors: [AppColors.success, Color(0xFF34D399)],
-                      )
-                      : AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.confirmation_number_rounded,
-              color: Colors.white,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+      child: selected == null
+          ? const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  tier.name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                if (tier.description != null && tier.description!.isNotEmpty)
-                  Text(
-                    tier.description!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                const SizedBox(height: 4),
                 Row(
                   children: [
-                    if (tier.capacity != null)
-                      Text(
-                        '${tier.capacity! - tier.soldCount} left',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    if (tier.capacity != null) const SizedBox(width: 8),
+                    Icon(Icons.auto_awesome, color: AppColors.primaryLight, size: 18),
+                    SizedBox(width: 8),
                     Text(
-                      '${tier.soldCount} sold',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
+                      'Select Admission Tier',
+                      style: TextStyle(
+                        color: AppNight.text,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],
                 ),
+                SizedBox(height: 6),
+                Text(
+                  'Choose a tier to view what is included and reserve admission.',
+                  style: TextStyle(color: AppNight.muted, fontSize: 13, height: 1.4),
+                ),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.workspace_premium_outlined, color: AppColors.primaryLight, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${selected.name} Inclusions',
+                        style: const TextStyle(
+                          color: AppNight.text,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  (selected.description != null && selected.description!.trim().isNotEmpty)
+                      ? selected.description!
+                      : 'Admission for ${selected.name}. Your pass is delivered in the app with a QR code for the gate.',
+                  style: const TextStyle(color: AppNight.muted, fontSize: 13, height: 1.4),
+                ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                isFree ? 'FREE' : '₦${tier.price.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: isFree ? AppColors.success : AppColors.primary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              GestureDetector(
-                onTap: tier.isActive
-                    ? () => context.push('/events/$eventId/tickets')
-                    : null,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color:
-                        tier.isActive
-                            ? AppColors.primarySurface
-                            : AppColors.border,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    tier.isActive ? 'Buy Now' : 'Sold Out',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color:
-                          tier.isActive
-                              ? AppColors.primary
-                              : AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
 
+String _naira(double value) => '₦${value.toStringAsFixed(2)}';
+
+String _when(EventModel event) {
+  DateTime? date;
+  try {
+    date = DateTime.parse(event.startDate);
+  } catch (_) {}
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  final datePart = date == null
+      ? event.startDate
+      : '${date.day} ${months[date.month - 1]}';
+  final time = event.startTime?.trim();
+  if (time == null || time.isEmpty) return datePart;
+  return '$datePart · $time';
+}

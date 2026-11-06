@@ -57,6 +57,18 @@ class AppColors {
   );
 }
 
+/// Dark surfaces used by the attendee shell (home, events, votes, profile).
+class AppNight {
+  static const Color background = Color(0xFF0B1020);
+  static const Color surface = Color(0xFF151C2E);
+  static const Color surfaceHigh = Color(0xFF1C2538);
+  static const Color card = Color(0xFF171F33);
+  static const Color border = Color(0xFF2A3550);
+  static const Color text = Color(0xFFF5F7FB);
+  static const Color muted = Color(0xFF93A0B5);
+  static const Color nav = Color(0xE61A2236);
+}
+
 class AppTextStyles {
   static const String fontFamily = 'SF Pro Display';
 
@@ -185,7 +197,7 @@ class AppTheme {
           letterSpacing: -0.2,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(

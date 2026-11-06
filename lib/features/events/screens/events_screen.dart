@@ -114,7 +114,7 @@ class _EventsScreenState extends State<EventsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppNight.background,
       body: RefreshIndicator(
         color: AppColors.primary,
         onRefresh: () => _load(),
